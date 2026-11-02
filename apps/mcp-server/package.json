@@ -1,0 +1,29 @@
+{
+  "name": "@agentmap/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "cli": "node dist/cli.js",
+    "start": "node dist/index.js",
+    "dev": "node dist/index.js"
+  },
+  "dependencies": {
+    "@agentmap/contracts": "workspace:*",
+    "@agentmap/db": "workspace:*",
+    "@agentmap/offers": "workspace:*",
+    "zod": "^3.24.0",
+    "@agentmap/matching": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "bin": {
+    "agentmap-admin": "./dist/cli.js"
+  }
+}
