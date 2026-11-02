@@ -1,1 +1,1 @@
-export * from "./client.js"; export * from "./queue.js"; export * from "./events.js"; export * from "./publish.js"; export * from "./registry.js";
+export * from "./client.js"; export * from "./queue.js"; export * from "./events.js"; export * from "./publish.js"; export * from "./registry.js"; export * from "./analytics.js"; export * from "./offers-db.js";

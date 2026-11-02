@@ -57,7 +57,7 @@ export class MatchingService {
       }
     }
     // Node fallback
-    const ranked = (await rankNodes(this.embeddings, qEmb, liveNodes, this.cfg.kindPrior)).filter((r) => r.similarity >= this.cfg.nodeFloor).slice(0, 8);
+    const ranked = (await rankNodes(this.embeddings, qEmb, liveNodes, this.cfg.kindPrior, canonical || norm.text)).filter((r) => r.similarity >= this.cfg.nodeFloor).slice(0, 8);
     if (!ranked.length) return { mapped: true as const, found: false as const, reason: "no_path" as const, canonical };
     const entries = liveNodes.filter((n) => n.kind === "home" || n.kind === "search");
     const entryIds = entries.length ? entries.map((n) => n.id) : liveNodes.slice(0, 1).map((n) => n.id);

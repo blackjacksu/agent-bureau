@@ -9,7 +9,9 @@ export function cosine(a: number[], b: number[]): number {
 }
 /** Deterministic token-hashing embedding for tests/offline. No network. */
 export class FakeEmbeddingProvider implements EmbeddingProvider {
-  model = "fake/token-hash@1"; constructor(public dims = 128) {}
+  // Default dims must match the DB vector(1536) column: indexer and query service
+  // create separate provider instances, and mismatched dims make cosine meaningless.
+  model = "fake/token-hash@1"; constructor(public dims = 1536) {}
   async embed(text: string): Promise<number[]> {
     const v = new Array(this.dims).fill(0);
     const toks = tokenize(text).map((t) => (t.length > 3 && t.endsWith("s") ? t.slice(0, -1) : t));
