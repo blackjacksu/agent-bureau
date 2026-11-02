@@ -5,6 +5,7 @@ const Env = z.object({
   MCP_ALLOWED_ORIGINS: z.string().default("http://localhost:3000"),
   API_KEY_PEPPER: z.string().min(1).default("dev-only-pepper-change-me"),
   DATABASE_URL: z.string().optional(),
+  ADMIN_TOKEN: z.string().optional(),
   OFFERS_ENABLED: z.string().default("false").transform((v) => v === "true"),
   LOG_LEVEL: z.string().default("info"),
 });

@@ -29,7 +29,12 @@ export function storeToMatchingRepo(store: Store): MatchingRepository {
   } as MatchingRepository;
 }
 export function createDefaultMatching(env: Record<string,string|undefined>=process.env): MatchingPort {
-  const svcFor = (store:Store)=> new MatchingService(storeToMatchingRepo(store), createEmbeddingProviderFromEnv(env), matchingConfigFromEnv(env));
+  const svcFor = (store:Store)=> { const provider = createEmbeddingProviderFromEnv(env); const cfg = matchingConfigFromEnv(env);
+    // Token-hash (fake) embeddings have a compressed similarity scale vs hosted models:
+    // a correct top hit scores ~0.5, under the hosted-calibrated 0.55 floor. Lower the floor
+    // for fake providers only (explicit MATCHING_NODE_FLOOR always wins).
+    if (provider.model.startsWith("fake/") && env.MATCHING_NODE_FLOOR == null) cfg.nodeFloor = 0.2;
+    return new MatchingService(storeToMatchingRepo(store), provider, cfg); };
   return {
     async find(store:Store,domain:string,question:string){ const r:any= await svcFor(store).find(domain,question); if(!r.mapped) return null; if(!r.found) return {mapped:true,found:false,reason:r.reason,_canonical:r.canonical,_confidence:r.confidence}; const {_c,...rest}=r; return {...rest, offers: [] as Offer[], _canonical:r.canonical}; },
     async getPath(store:Store,domain:string,goal:string){ return svcFor(store).getPath(domain,goal); }
@@ -146,6 +151,19 @@ export class Services {
     const sites = await this.store.listMySites(agent.agentId);
     this.events.write({ agent_id: agent.agentId, domain: domains[0] ?? null, type: "query", metadata: {} });
     return { sites: sites.map((s) => ({ domain: s.domain, status: s.status as any, map_version: s.status === "mapped" ? s.map_version : null })) };
+  }
+  /** find_offers (plan 16.4): registered only when OFFERS_ENABLED. Never blocks, never serves opted-out domains (provider enforces). */
+  async findOffers(agent: { agentId: string; tier: string }, input: { domain: string; question?: string }) {
+    const domain = normalizeDomain(input.domain);
+    const site = await this.store.getSite(domain);
+    if (site?.status === "opted_out") return { offers: [] as Offer[] };
+    if (!this.opts.offersEnabled || !this.opts.offers) return { offers: [] as Offer[] };
+    const offers = await Promise.race([
+      this.opts.offers({ domain, question: input.question ?? "", agentTier: agent.tier }),
+      new Promise<Offer[]>((r) => setTimeout(() => r([]), 100)),
+    ]).catch(() => [] as Offer[]);
+    if (offers.length) this.events.write({ agent_id: agent.agentId, domain, type: "offers_served", metadata: { offer_ids: offers.map((o) => o.offer_id), domain, via: "find_offers" } });
+    return { offers: offers.slice(0, 3) };
   }
 }
 export function safeHost(url: string) { try { return new URL(url).hostname; } catch { return null; } }

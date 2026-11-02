@@ -1,4 +1,4 @@
-import { PgClient, BatchedEventWriter } from "@agentmap/db";
+import { PgClient, BatchedEventWriter, listActiveOffers } from "@agentmap/db";
 import { EmptyOfferProvider, getOffers } from "@agentmap/offers";
 import { loadConfig } from "./config.js";
 import { createApp } from "./server.js";
@@ -9,11 +9,14 @@ export * from "./server.js"; export * from "./services.js"; export * from "./sto
 
 export function buildFromEnv() {
   const cfg = loadConfig();
-  let store: any; let events: any;
-  if (cfg.DATABASE_URL) { const db = PgClient.fromUrl(cfg.DATABASE_URL); store = new PgStore(db); events = new BatchedEventWriter(db); }
+  let store: any; let events: any; let registryDb: any;
+  if (cfg.DATABASE_URL) { const db = PgClient.fromUrl(cfg.DATABASE_URL); store = new PgStore(db); events = new BatchedEventWriter(db); registryDb = db; }
   else { store = new InMemoryStore(); }
-  const provider = new EmptyOfferProvider();
-  const app = createApp({ store, pepper: cfg.API_KEY_PEPPER, allowedOrigins: cfg.allowedOrigins, events, verifier: new HttpVerifier(), offersEnabled: cfg.OFFERS_ENABLED, offers: async (a: any) => getOffers(provider, a, { optedOut: false, offersEnabled: cfg.OFFERS_ENABLED, domainEnabled: true, tierAllowed: true, now: new Date() }) });
+  // Phase 5 (plan 16.5): with OFFERS_ENABLED + DB, serve stored merchant/public offers; otherwise the dark empty provider.
+  const provider: any = cfg.OFFERS_ENABLED && registryDb
+    ? { getOffers: async (a: any) => listActiveOffers(registryDb, a.domain) }
+    : new EmptyOfferProvider();
+  const app = createApp({ store, pepper: cfg.API_KEY_PEPPER, allowedOrigins: cfg.allowedOrigins, events, verifier: new HttpVerifier(), registryDb, adminToken: cfg.ADMIN_TOKEN, offersEnabled: cfg.OFFERS_ENABLED, offers: async (a: any) => getOffers(provider, a, { optedOut: false, offersEnabled: cfg.OFFERS_ENABLED, domainEnabled: true, tierAllowed: true, now: new Date() }) });
   return { cfg, app };
 }
 const isMain = import.meta.url === `file://${process.argv[1]}`;
