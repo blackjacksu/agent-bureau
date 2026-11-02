@@ -1,0 +1,832 @@
+{
+ "schemas": {
+  "auto": {
+   "required": [
+    "year",
+    "make",
+    "model"
+   ],
+   "properties": {
+    "year": {
+     "type": "number"
+    },
+    "make": {
+     "enum": [
+      "Honda",
+      "Toyota",
+      "Ford",
+      "Nissan",
+      "BMW"
+     ]
+    },
+    "model": {
+     "enum": [
+      "Civic",
+      "Accord",
+      "Camry",
+      "Corolla",
+      "F-150",
+      "Altima"
+     ]
+    },
+    "position": {
+     "enum": [
+      "front",
+      "rear"
+     ]
+    }
+   }
+  },
+  "home": {
+   "required": [
+    "size"
+   ],
+   "properties": {
+    "size": {
+     "type": "string"
+    },
+    "room": {
+     "enum": [
+      "kitchen",
+      "bathroom",
+      "bedroom",
+      "living room"
+     ]
+    },
+    "finish": {
+     "enum": [
+      "white",
+      "black",
+      "oak",
+      "chrome"
+     ]
+    }
+   }
+  },
+  "skin": {
+   "required": [
+    "skin_type"
+   ],
+   "properties": {
+    "skin_type": {
+     "enum": [
+      "oily",
+      "dry",
+      "sensitive",
+      "combination"
+     ]
+    },
+    "concern": {
+     "enum": [
+      "acne",
+      "aging",
+      "redness",
+      "dryness"
+     ]
+    },
+    "product_type": {
+     "enum": [
+      "serum",
+      "moisturizer",
+      "cleanser",
+      "sunscreen"
+     ]
+    }
+   }
+  }
+ },
+ "cases": [
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "front brake pads for a 2018 Honda Civic",
+   "params": {
+    "year": 2018,
+    "make": "Honda",
+    "model": "Civic",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "brake pads for 2020 Toyota Camry rear",
+   "params": {
+    "year": 2020,
+    "make": "Toyota",
+    "model": "Camry",
+    "position": "rear"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "2019 Ford F-150 front brake pads",
+   "params": {
+    "year": 2019,
+    "make": "Ford",
+    "model": "F-150",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "Honda Accord 2021 brake pads",
+   "params": {
+    "year": 2021,
+    "make": "Honda",
+    "model": "Accord"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "Nissan Altima 2017 rear brake pads",
+   "params": {
+    "year": 2017,
+    "make": "Nissan",
+    "model": "Altima",
+    "position": "rear"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "brake pads for a Honda Civic",
+   "params": {
+    "make": "Honda",
+    "model": "Civic"
+   },
+   "missing": [
+    "year"
+   ]
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "front brake pads for a 2018 Honda",
+   "params": {
+    "year": 2018,
+    "make": "Honda",
+    "position": "front"
+   },
+   "missing": [
+    "model"
+   ]
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "brake pads for a Civic 2018",
+   "params": {
+    "year": 2018,
+    "model": "Civic"
+   },
+   "missing": [
+    "make"
+   ]
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "civc brake pads 2018 Honda",
+   "params": {
+    "year": 2018,
+    "make": "Honda",
+    "model": "Civic"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "2022 Toyota Corolla front brake pads",
+   "params": {
+    "year": 2022,
+    "make": "Toyota",
+    "model": "Corolla",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "rear pads for 2015 Ford F-150",
+   "params": {
+    "year": 2015,
+    "make": "Ford",
+    "model": "F-150",
+    "position": "rear"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "2016 Nissan Altima brake pads front",
+   "params": {
+    "year": 2016,
+    "make": "Nissan",
+    "model": "Altima",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "brake pads Honda Civic 2018 front",
+   "params": {
+    "year": 2018,
+    "make": "Honda",
+    "model": "Civic",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "front brake pads for a 2023 Honda Accord",
+   "params": {
+    "year": 2023,
+    "make": "Honda",
+    "model": "Accord",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "2020 Camry brake pads",
+   "params": {
+    "year": 2020,
+    "model": "Camry"
+   },
+   "missing": [
+    "make"
+   ]
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "brake pads for a 2018 Civic",
+   "params": {
+    "year": 2018,
+    "model": "Civic"
+   },
+   "missing": [
+    "make"
+   ]
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "front brake pads for a Honda Civic 2019",
+   "params": {
+    "year": 2019,
+    "make": "Honda",
+    "model": "Civic",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "2014 Toyota Corolla rear brake pads",
+   "params": {
+    "year": 2014,
+    "make": "Toyota",
+    "model": "Corolla",
+    "position": "rear"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "brake pads for Ford F-150",
+   "params": {
+    "make": "Ford",
+    "model": "F-150"
+   },
+   "missing": [
+    "year"
+   ]
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "2018 Honda Civic brake pads",
+   "params": {
+    "year": 2018,
+    "make": "Honda",
+    "model": "Civic"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "rear brake pads 2021 Nissan Altima",
+   "params": {
+    "year": 2021,
+    "make": "Nissan",
+    "model": "Altima",
+    "position": "rear"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "front brake pads Toyota Camry 2018",
+   "params": {
+    "year": 2018,
+    "make": "Toyota",
+    "model": "Camry",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "brake pads for a 2025 Honda Civic front",
+   "params": {
+    "year": 2025,
+    "make": "Honda",
+    "model": "Civic",
+    "position": "front"
+   },
+   "missing": []
+  },
+  {
+   "cat": "auto",
+   "schema": "auto",
+   "q": "2013 Ford F-150 brake pads rear",
+   "params": {
+    "year": 2013,
+    "make": "Ford",
+    "model": "F-150",
+    "position": "rear"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "24 inch bathroom vanity white",
+   "params": {
+    "size": "24 inch",
+    "room": "bathroom",
+    "finish": "white"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "36 inch kitchen sink chrome",
+   "params": {
+    "size": "36 inch",
+    "room": "kitchen",
+    "finish": "chrome"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "10x12 bedroom rug",
+   "params": {
+    "size": "10x12",
+    "room": "bedroom"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "48 inch bathroom vanity oak",
+   "params": {
+    "size": "48 inch",
+    "room": "bathroom",
+    "finish": "oak"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "30 inch kitchen cabinet black",
+   "params": {
+    "size": "30 inch",
+    "room": "kitchen",
+    "finish": "black"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "12x15 living room rug white",
+   "params": {
+    "size": "12x15",
+    "room": "living room",
+    "finish": "white"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "18 inch bathroom mirror chrome",
+   "params": {
+    "size": "18 inch",
+    "room": "bathroom",
+    "finish": "chrome"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "60 inch kitchen island oak",
+   "params": {
+    "size": "60 inch",
+    "room": "kitchen",
+    "finish": "oak"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "24 inch bedroom nightstand black",
+   "params": {
+    "size": "24 inch",
+    "room": "bedroom",
+    "finish": "black"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "40 inch living room shelf oak",
+   "params": {
+    "size": "40 inch",
+    "room": "living room",
+    "finish": "oak"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "bathroom vanity white",
+   "params": {
+    "room": "bathroom",
+    "finish": "white"
+   },
+   "missing": [
+    "size"
+   ]
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "kitchen faucet chrome",
+   "params": {
+    "room": "kitchen",
+    "finish": "chrome"
+   },
+   "missing": [
+    "size"
+   ]
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "72 inch bathroom vanity",
+   "params": {
+    "size": "72 inch",
+    "room": "bathroom"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "8x10 bedroom rug",
+   "params": {
+    "size": "8x10",
+    "room": "bedroom"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "32 inch kitchen sink white",
+   "params": {
+    "size": "32 inch",
+    "room": "kitchen",
+    "finish": "white"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "20 inch bathroom cabinet oak",
+   "params": {
+    "size": "20 inch",
+    "room": "bathroom",
+    "finish": "oak"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "15 inch kitchen drawer black",
+   "params": {
+    "size": "15 inch",
+    "room": "kitchen",
+    "finish": "black"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "9x12 living room rug",
+   "params": {
+    "size": "9x12",
+    "room": "living room"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "28 inch bedroom dresser white",
+   "params": {
+    "size": "28 inch",
+    "room": "bedroom",
+    "finish": "white"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "44 inch bathroom counter chrome",
+   "params": {
+    "size": "44 inch",
+    "room": "bathroom",
+    "finish": "chrome"
+   },
+   "missing": []
+  },
+  {
+   "cat": "home",
+   "schema": "home",
+   "q": "26 inch kitchen stool oak",
+   "params": {
+    "size": "26 inch",
+    "room": "kitchen",
+    "finish": "oak"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "serum for oily skin with acne",
+   "params": {
+    "skin_type": "oily",
+    "concern": "acne",
+    "product_type": "serum"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "moisturizer for dry skin",
+   "params": {
+    "skin_type": "dry",
+    "product_type": "moisturizer"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "cleanser for sensitive skin with redness",
+   "params": {
+    "skin_type": "sensitive",
+    "concern": "redness",
+    "product_type": "cleanser"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "sunscreen for combination skin",
+   "params": {
+    "skin_type": "combination",
+    "product_type": "sunscreen"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "serum for dry skin and aging",
+   "params": {
+    "skin_type": "dry",
+    "concern": "aging",
+    "product_type": "serum"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "moisturizer for sensitive skin dryness",
+   "params": {
+    "skin_type": "sensitive",
+    "concern": "dryness",
+    "product_type": "moisturizer"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "cleanser for oily skin",
+   "params": {
+    "skin_type": "oily",
+    "product_type": "cleanser"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "serum for combination skin acne",
+   "params": {
+    "skin_type": "combination",
+    "concern": "acne",
+    "product_type": "serum"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "sunscreen for dry skin",
+   "params": {
+    "skin_type": "dry",
+    "product_type": "sunscreen"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "moisturizer for oily skin redness",
+   "params": {
+    "skin_type": "oily",
+    "concern": "redness",
+    "product_type": "moisturizer"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "skincare serum aging",
+   "params": {
+    "concern": "aging",
+    "product_type": "serum"
+   },
+   "missing": [
+    "skin_type"
+   ]
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "cleanser for acne",
+   "params": {
+    "concern": "acne",
+    "product_type": "cleanser"
+   },
+   "missing": [
+    "skin_type"
+   ]
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "sensitive skin moisturizer",
+   "params": {
+    "skin_type": "sensitive",
+    "product_type": "moisturizer"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "oily skin sunscreen acne",
+   "params": {
+    "skin_type": "oily",
+    "concern": "acne",
+    "product_type": "sunscreen"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "dry skin cleanser dryness",
+   "params": {
+    "skin_type": "dry",
+    "concern": "dryness",
+    "product_type": "cleanser"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "combination skin serum redness",
+   "params": {
+    "skin_type": "combination",
+    "concern": "redness",
+    "product_type": "serum"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "aging serum for sensitive skin",
+   "params": {
+    "skin_type": "sensitive",
+    "concern": "aging",
+    "product_type": "serum"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "redness moisturizer for combination skin",
+   "params": {
+    "skin_type": "combination",
+    "concern": "redness",
+    "product_type": "moisturizer"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "acne cleanser for dry skin",
+   "params": {
+    "skin_type": "dry",
+    "concern": "acne",
+    "product_type": "cleanser"
+   },
+   "missing": []
+  },
+  {
+   "cat": "skin",
+   "schema": "skin",
+   "q": "dryness serum for oily skin",
+   "params": {
+    "skin_type": "oily",
+    "concern": "dryness",
+    "product_type": "serum"
+   },
+   "missing": []
+  }
+ ]
+}

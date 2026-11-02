@@ -1,0 +1,13 @@
+import { z } from "zod";
+export const SiteStatusSchema = z.enum(["mapped","queued","indexing","blocked","opted_out","failed"]);
+export type SiteStatus = z.infer<typeof SiteStatusSchema>;
+export const NodeKindSchema = z.enum(["home","search","category","filter","product","cart","other"]);
+export const EdgeActionSchema = z.enum(["navigate","click","fill","select","set_vehicle","filter","submit"]);
+export const SiteSchema = z.object({ domain: z.string(), status: SiteStatusSchema, map_version: z.number().int().nonnegative(), last_indexed_at: z.string().datetime().nullable(), robots_policy: z.record(z.unknown()).nullable().optional(), demand_score: z.number().default(0), offers_enabled: z.boolean().default(false) });
+export type Site = z.infer<typeof SiteSchema>;
+export const NodeSchema = z.object({ id: z.string().uuid(), domain: z.string(), map_version: z.number().int(), url_pattern: z.string(), kind: NodeKindSchema, description: z.string(), embedding_model: z.string().optional(), last_verified_at: z.string().datetime().nullable().optional(), stale: z.boolean().default(false) });
+export type GraphNode = z.infer<typeof NodeSchema>;
+export const EdgeSchema = z.object({ id: z.string().uuid(), domain: z.string(), map_version: z.number().int(), from_node_id: z.string().uuid(), to_node_id: z.string().uuid(), action: EdgeActionSchema, selector: z.string().nullable().optional(), selector_fallbacks: z.array(z.string()).optional(), url_template: z.string().nullable().optional(), params_schema: z.record(z.unknown()).optional(), attempts: z.number().int().default(0), successes: z.number().int().default(0), stale: z.boolean().default(false) }).refine(e=>e.selector!=null||e.url_template!=null,{message:"edge requires selector or url_template"});
+export type GraphEdge = z.infer<typeof EdgeSchema>;
+export const PathCacheSchema = z.object({ id: z.string().uuid(), domain: z.string(), question_canonical: z.string(), ordered_edge_ids: z.array(z.string().uuid()), param_bindings: z.record(z.unknown()).optional(), hits: z.number().int().default(0), successes: z.number().int().default(0), last_success_at: z.string().datetime().nullable().optional(), stale: z.boolean().default(false) });
+export type PathCache = z.infer<typeof PathCacheSchema>;

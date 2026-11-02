@@ -1,0 +1,1 @@
+{"input":{"domain":"autozone.com","goal":"brake pads"},"output":{"steps":[{"action":"navigate","url":"https://www.autozone.com/brakes"}],"from_node":"home","to_node":"brake-pads","result_url_template":null}}

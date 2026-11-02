@@ -1,0 +1,1 @@
+{"input":{"url":"https://autozone.com/product/123","fields":["price","stock"]},"output":{"url":"https://autozone.com/product/123","status":"ok","price":{"amount_minor":4999,"currency":"USD"},"stock":"in_stock","checked_at":"2026-01-01T00:00:00.000Z","source":"live"}}
