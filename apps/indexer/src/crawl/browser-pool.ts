@@ -58,8 +58,16 @@ export class PlaywrightPageFetcher implements PageFetcher {
     } finally { await page.close().catch(() => {}); }
   }
   async fetchText(url: string) {
-    const snap = await this.fetch(url);
-    return { status: snap.status, text: snap.html };
+    // Text resources (robots.txt) must not be rendered as a page: browser content() wraps
+    // text/plain in HTML and corrupts line-based parsing. Use the context request API.
+    const ctx = await this.ensure();
+    try {
+      const res = await ctx.request.get(url, { timeout: this.timeoutMs });
+      return { status: res.status(), text: await res.text(), etag: res.headers()["etag"] };
+    } catch {
+      const snap = await this.fetch(url);
+      return { status: snap.status, text: snap.html };
+    }
   }
   async close() { await this.context?.close().catch(() => {}); await this.browser?.close().catch(() => {}); this.context = null; this.browser = null; }
 }
