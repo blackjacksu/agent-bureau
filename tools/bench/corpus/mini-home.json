@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "site_kind": "fixture",
+  "tasks": [
+    { "id": "paint-living", "domain": "mini-home.example", "question": "interior paint for living room", "expected_url_pattern": "/paint/interior", "required_params": [] },
+    { "id": "drill-18v", "domain": "mini-home.example", "question": "cordless drill 18V", "expected_url_pattern": "/tools/drills", "required_params": [] }
+  ]
+}

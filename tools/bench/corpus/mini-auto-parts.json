@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "site_kind": "fixture",
+  "tasks": [
+    { "id": "brake-pads-civic", "domain": "mini-auto.example", "question": "front brake pads for a 2018 Honda Civic", "expected_url_pattern": "/brakes/brake-pads", "required_params": ["year", "make", "model"] },
+    { "id": "brake-pads-generic", "domain": "mini-auto.example", "question": "brake pads", "expected_url_pattern": "/brakes/brake-pads", "required_params": [] },
+    { "id": "oil-filter", "domain": "mini-auto.example", "question": "oil filter for a 2020 Toyota Camry", "expected_url_pattern": "/filters/oil", "required_params": ["year", "make", "model"] }
+  ]
+}
