@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "site_kind": "real",
+  "tasks": [
+    {
+      "id": "pc-vitamin-c",
+      "domain": "paulaschoice.com",
+      "question": "vitamin C serum for brightening",
+      "expected_url_pattern": "vitamin-c",
+      "required_params": []
+    },
+    {
+      "id": "pc-exfoliant",
+      "domain": "paulaschoice.com",
+      "question": "BHA liquid exfoliant",
+      "expected_url_pattern": "exfoliant",
+      "required_params": []
+    },
+    {
+      "id": "pc-moisturizer",
+      "domain": "paulaschoice.com",
+      "question": "moisturizer for dry skin",
+      "expected_url_pattern": "moisturizer",
+      "required_params": [
+        "skin_type"
+      ]
+    },
+    {
+      "id": "pc-cleanser",
+      "domain": "paulaschoice.com",
+      "question": "gentle cleanser for sensitive skin",
+      "expected_url_pattern": "cleanser",
+      "required_params": [
+        "skin_type"
+      ]
+    },
+    {
+      "id": "pc-sunscreen",
+      "domain": "paulaschoice.com",
+      "question": "SPF 50 sunscreen",
+      "expected_url_pattern": "sunscreen",
+      "required_params": [
+        "spf"
+      ]
+    },
+    {
+      "id": "pc-retinol",
+      "domain": "paulaschoice.com",
+      "question": "retinol treatment",
+      "expected_url_pattern": "retinol",
+      "required_params": []
+    },
+    {
+      "id": "pc-niacinamide",
+      "domain": "paulaschoice.com",
+      "question": "niacinamide serum",
+      "expected_url_pattern": "niacinamide",
+      "required_params": []
+    },
+    {
+      "id": "pc-azelaic",
+      "domain": "paulaschoice.com",
+      "question": "azelaic acid booster",
+      "expected_url_pattern": "azelaic",
+      "required_params": []
+    },
+    {
+      "id": "pc-eye-cream",
+      "domain": "paulaschoice.com",
+      "question": "eye cream",
+      "expected_url_pattern": "eye-cream",
+      "required_params": []
+    },
+    {
+      "id": "pc-toner",
+      "domain": "paulaschoice.com",
+      "question": "hydrating toner",
+      "expected_url_pattern": "toner",
+      "required_params": []
+    },
+    {
+      "id": "pc-acne",
+      "domain": "paulaschoice.com",
+      "question": "acne treatment with benzoyl peroxide",
+      "expected_url_pattern": "acne",
+      "required_params": []
+    },
+    {
+      "id": "pc-body-lotion",
+      "domain": "paulaschoice.com",
+      "question": "body lotion with retinol",
+      "expected_url_pattern": "body",
+      "required_params": []
+    },
+    {
+      "id": "pc-lip",
+      "domain": "paulaschoice.com",
+      "question": "lip treatment balm",
+      "expected_url_pattern": "lip",
+      "required_params": []
+    },
+    {
+      "id": "pc-mask",
+      "domain": "paulaschoice.com",
+      "question": "clay mask for pores",
+      "expected_url_pattern": "mask",
+      "required_params": []
+    },
+    {
+      "id": "pc-peptide",
+      "domain": "paulaschoice.com",
+      "question": "peptide serum",
+      "expected_url_pattern": "peptide",
+      "required_params": []
+    },
+    {
+      "id": "pc-ceramide",
+      "domain": "paulaschoice.com",
+      "question": "ceramide moisturizer",
+      "expected_url_pattern": "ceramide",
+      "required_params": []
+    },
+    {
+      "id": "pc-aha",
+      "domain": "paulaschoice.com",
+      "question": "AHA exfoliant gel",
+      "expected_url_pattern": "exfoliant",
+      "required_params": []
+    },
+    {
+      "id": "pc-oil",
+      "domain": "paulaschoice.com",
+      "question": "facial oil for dry skin",
+      "expected_url_pattern": "oil",
+      "required_params": [
+        "skin_type"
+      ]
+    },
+    {
+      "id": "pc-spot",
+      "domain": "paulaschoice.com",
+      "question": "spot treatment for blemishes",
+      "expected_url_pattern": "acne",
+      "required_params": []
+    },
+    {
+      "id": "pc-night",
+      "domain": "paulaschoice.com",
+      "question": "night moisturizer with peptides",
+      "expected_url_pattern": "moisturizer",
+      "required_params": []
+    }
+  ]
+}

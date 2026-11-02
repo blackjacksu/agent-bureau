@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "site_kind": "real",
+  "tasks": [
+    {
+      "id": "cp-brake-pads",
+      "domain": "carparts.com",
+      "question": "brake pads for a 2018 Honda Civic",
+      "expected_url_pattern": "brake",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-headlight",
+      "domain": "carparts.com",
+      "question": "headlight for a 2017 Ford F-150",
+      "expected_url_pattern": "headlight",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-mirror",
+      "domain": "carparts.com",
+      "question": "side mirror for a 2019 Toyota Camry",
+      "expected_url_pattern": "mirror",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-bumper",
+      "domain": "carparts.com",
+      "question": "front bumper for a 2016 Jeep Grand Cherokee",
+      "expected_url_pattern": "bumper",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-grille",
+      "domain": "carparts.com",
+      "question": "grille for a 2020 Chevrolet Silverado",
+      "expected_url_pattern": "grille",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-tail-light",
+      "domain": "carparts.com",
+      "question": "tail light for a 2015 Honda Accord",
+      "expected_url_pattern": "tail-light",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-fender",
+      "domain": "carparts.com",
+      "question": "fender for a 2018 Nissan Altima",
+      "expected_url_pattern": "fender",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-radiator",
+      "domain": "carparts.com",
+      "question": "radiator support for a 2017 Toyota Corolla",
+      "expected_url_pattern": "radiator",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-hood",
+      "domain": "carparts.com",
+      "question": "hood for a 2019 Ford Escape",
+      "expected_url_pattern": "hood",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-door-handle",
+      "domain": "carparts.com",
+      "question": "exterior door handle for a 2016 Honda CR-V",
+      "expected_url_pattern": "door-handle",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-window-regulator",
+      "domain": "carparts.com",
+      "question": "window regulator for a 2018 Toyota RAV4",
+      "expected_url_pattern": "window-regulator",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-ac-condenser",
+      "domain": "carparts.com",
+      "question": "AC condenser for a 2020 Hyundai Elantra",
+      "expected_url_pattern": "condenser",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-fuel-pump",
+      "domain": "carparts.com",
+      "question": "fuel pump assembly for a 2015 Chevrolet Malibu",
+      "expected_url_pattern": "fuel-pump",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-catalytic",
+      "domain": "carparts.com",
+      "question": "catalytic converter for a 2017 Honda Pilot",
+      "expected_url_pattern": "catalytic",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-suspension-kit",
+      "domain": "carparts.com",
+      "question": "suspension kit for a 2019 Ram 1500",
+      "expected_url_pattern": "suspension",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-shock",
+      "domain": "carparts.com",
+      "question": "shock absorber for a 2016 Ford Explorer",
+      "expected_url_pattern": "shock",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-control-arm",
+      "domain": "carparts.com",
+      "question": "control arm for a 2018 Mazda CX-5",
+      "expected_url_pattern": "control-arm",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-wheel",
+      "domain": "carparts.com",
+      "question": "wheel hub assembly for a 2020 Nissan Rogue",
+      "expected_url_pattern": "wheel",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-exhaust",
+      "domain": "carparts.com",
+      "question": "exhaust manifold for a 2017 Subaru Outback",
+      "expected_url_pattern": "exhaust",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "cp-lighting-kit",
+      "domain": "carparts.com",
+      "question": "LED lighting kit for a 2021 Jeep Wrangler",
+      "expected_url_pattern": "lighting",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    }
+  ]
+}

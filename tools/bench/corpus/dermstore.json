@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "site_kind": "real",
+  "tasks": [
+    {
+      "id": "ds-vitamin-c",
+      "domain": "dermstore.com",
+      "question": "vitamin C serum for brightening",
+      "expected_url_pattern": "vitamin-c",
+      "required_params": []
+    },
+    {
+      "id": "ds-sunscreen",
+      "domain": "dermstore.com",
+      "question": "SPF 50 sunscreen for sensitive skin",
+      "expected_url_pattern": "sunscreen",
+      "required_params": [
+        "spf"
+      ]
+    },
+    {
+      "id": "ds-retinol",
+      "domain": "dermstore.com",
+      "question": "retinol serum for beginners",
+      "expected_url_pattern": "retinol",
+      "required_params": []
+    },
+    {
+      "id": "ds-moisturizer-dry",
+      "domain": "dermstore.com",
+      "question": "moisturizer for dry skin",
+      "expected_url_pattern": "moisturizer",
+      "required_params": [
+        "skin_type"
+      ]
+    },
+    {
+      "id": "ds-cleanser-oily",
+      "domain": "dermstore.com",
+      "question": "gentle cleanser for oily skin",
+      "expected_url_pattern": "cleanser",
+      "required_params": [
+        "skin_type"
+      ]
+    },
+    {
+      "id": "ds-hyaluronic",
+      "domain": "dermstore.com",
+      "question": "hyaluronic acid serum",
+      "expected_url_pattern": "hyaluronic-acid",
+      "required_params": []
+    },
+    {
+      "id": "ds-eye-cream",
+      "domain": "dermstore.com",
+      "question": "eye cream for dark circles",
+      "expected_url_pattern": "eye-cream",
+      "required_params": []
+    },
+    {
+      "id": "ds-acne",
+      "domain": "dermstore.com",
+      "question": "salicylic acid treatment for acne",
+      "expected_url_pattern": "acne",
+      "required_params": []
+    },
+    {
+      "id": "ds-exfoliant",
+      "domain": "dermstore.com",
+      "question": "chemical exfoliant with AHA",
+      "expected_url_pattern": "exfoliant",
+      "required_params": []
+    },
+    {
+      "id": "ds-face-mask",
+      "domain": "dermstore.com",
+      "question": "hydrating face mask",
+      "expected_url_pattern": "face-mask",
+      "required_params": []
+    },
+    {
+      "id": "ds-lip-balm",
+      "domain": "dermstore.com",
+      "question": "lip balm with SPF",
+      "expected_url_pattern": "lip",
+      "required_params": []
+    },
+    {
+      "id": "ds-body-lotion",
+      "domain": "dermstore.com",
+      "question": "body lotion for very dry skin",
+      "expected_url_pattern": "body-lotion",
+      "required_params": []
+    },
+    {
+      "id": "ds-shampoo",
+      "domain": "dermstore.com",
+      "question": "shampoo for color treated hair",
+      "expected_url_pattern": "shampoo",
+      "required_params": []
+    },
+    {
+      "id": "ds-conditioner",
+      "domain": "dermstore.com",
+      "question": "conditioner for damaged hair",
+      "expected_url_pattern": "conditioner",
+      "required_params": []
+    },
+    {
+      "id": "ds-spot-treatment",
+      "domain": "dermstore.com",
+      "question": "spot treatment for blemishes",
+      "expected_url_pattern": "spot-treatment",
+      "required_params": []
+    },
+    {
+      "id": "ds-toner",
+      "domain": "dermstore.com",
+      "question": "alcohol free toner",
+      "expected_url_pattern": "toner",
+      "required_params": []
+    },
+    {
+      "id": "ds-night-cream",
+      "domain": "dermstore.com",
+      "question": "night cream with peptides",
+      "expected_url_pattern": "night-cream",
+      "required_params": []
+    },
+    {
+      "id": "ds-hand-cream",
+      "domain": "dermstore.com",
+      "question": "hand cream for dry hands",
+      "expected_url_pattern": "hand-cream",
+      "required_params": []
+    },
+    {
+      "id": "ds-mineral-sunscreen",
+      "domain": "dermstore.com",
+      "question": "mineral sunscreen for face",
+      "expected_url_pattern": "sunscreen",
+      "required_params": [
+        "spf"
+      ]
+    },
+    {
+      "id": "ds-anti-aging",
+      "domain": "dermstore.com",
+      "question": "anti aging serum with niacinamide",
+      "expected_url_pattern": "niacinamide",
+      "required_params": []
+    }
+  ]
+}

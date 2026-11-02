@@ -1,0 +1,227 @@
+{
+  "version": 1,
+  "site_kind": "real",
+  "tasks": [
+    {
+      "id": "ra-brake-pads-civic",
+      "domain": "rockauto.com",
+      "question": "front brake pads for a 2018 Honda Civic",
+      "expected_url_pattern": "brake-pads",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-brake-rotors-f150",
+      "domain": "rockauto.com",
+      "question": "brake rotors for a 2019 Ford F-150",
+      "expected_url_pattern": "brake-rotor",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-oil-filter-camry",
+      "domain": "rockauto.com",
+      "question": "oil filter for a 2020 Toyota Camry",
+      "expected_url_pattern": "oil-filter",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-air-filter-altima",
+      "domain": "rockauto.com",
+      "question": "engine air filter for a 2017 Nissan Altima",
+      "expected_url_pattern": "air-filter",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-alternator-silverado",
+      "domain": "rockauto.com",
+      "question": "alternator for a 2016 Chevrolet Silverado 1500",
+      "expected_url_pattern": "alternator",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-starter-accord",
+      "domain": "rockauto.com",
+      "question": "starter motor for a 2015 Honda Accord",
+      "expected_url_pattern": "starter",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-battery-tacoma",
+      "domain": "rockauto.com",
+      "question": "car battery for a 2021 Toyota Tacoma",
+      "expected_url_pattern": "battery",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-shocks-ram",
+      "domain": "rockauto.com",
+      "question": "front shock absorbers for a 2018 Ram 1500",
+      "expected_url_pattern": "shock",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-control-arm-crv",
+      "domain": "rockauto.com",
+      "question": "front lower control arm for a 2019 Honda CR-V",
+      "expected_url_pattern": "control-arm",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-wheel-bearing-escape",
+      "domain": "rockauto.com",
+      "question": "front wheel hub bearing for a 2017 Ford Escape",
+      "expected_url_pattern": "wheel-hub",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-headlight-rav4",
+      "domain": "rockauto.com",
+      "question": "headlight assembly for a 2020 Toyota RAV4",
+      "expected_url_pattern": "headlight",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-radiator-jeep",
+      "domain": "rockauto.com",
+      "question": "radiator for a 2016 Jeep Grand Cherokee",
+      "expected_url_pattern": "radiator",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-water-pump-civic",
+      "domain": "rockauto.com",
+      "question": "water pump for a 2018 Honda Civic",
+      "expected_url_pattern": "water-pump",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-spark-plugs-f150",
+      "domain": "rockauto.com",
+      "question": "spark plugs for a 2019 Ford F-150",
+      "expected_url_pattern": "spark-plug",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-cabin-filter-camry",
+      "domain": "rockauto.com",
+      "question": "cabin air filter for a 2020 Toyota Camry",
+      "expected_url_pattern": "cabin-air-filter",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-brake-pads-rear-civic",
+      "domain": "rockauto.com",
+      "question": "rear brake pads for a 2018 Honda Civic",
+      "expected_url_pattern": "brake-pads",
+      "required_params": [
+        "year",
+        "make",
+        "model",
+        "position"
+      ]
+    },
+    {
+      "id": "ra-wiper-silverado",
+      "domain": "rockauto.com",
+      "question": "windshield wiper blades for a 2016 Chevrolet Silverado 1500",
+      "expected_url_pattern": "wiper",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-oxygen-sensor-accord",
+      "domain": "rockauto.com",
+      "question": "oxygen sensor for a 2015 Honda Accord",
+      "expected_url_pattern": "oxygen-sensor",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-fuel-filter-ram",
+      "domain": "rockauto.com",
+      "question": "fuel filter for a 2018 Ram 1500",
+      "expected_url_pattern": "fuel-filter",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    },
+    {
+      "id": "ra-struts-crv",
+      "domain": "rockauto.com",
+      "question": "front strut assembly for a 2019 Honda CR-V",
+      "expected_url_pattern": "strut",
+      "required_params": [
+        "year",
+        "make",
+        "model"
+      ]
+    }
+  ]
+}

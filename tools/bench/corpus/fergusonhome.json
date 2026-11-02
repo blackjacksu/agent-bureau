@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "site_kind": "real",
+  "tasks": [
+    {
+      "id": "fh-ceiling-light",
+      "domain": "fergusonhome.com",
+      "question": "flush mount ceiling light for a kitchen",
+      "expected_url_pattern": "ceiling-light",
+      "required_params": []
+    },
+    {
+      "id": "fh-kitchen-faucet",
+      "domain": "fergusonhome.com",
+      "question": "single handle kitchen faucet",
+      "expected_url_pattern": "kitchen-faucet",
+      "required_params": []
+    },
+    {
+      "id": "fh-bathroom-vanity",
+      "domain": "fergusonhome.com",
+      "question": "36 inch bathroom vanity with top",
+      "expected_url_pattern": "bathroom-vanity",
+      "required_params": [
+        "size"
+      ]
+    },
+    {
+      "id": "fh-shower-head",
+      "domain": "fergusonhome.com",
+      "question": "rain shower head",
+      "expected_url_pattern": "shower-head",
+      "required_params": []
+    },
+    {
+      "id": "fh-toilet",
+      "domain": "fergusonhome.com",
+      "question": "two piece elongated toilet",
+      "expected_url_pattern": "toilet",
+      "required_params": []
+    },
+    {
+      "id": "fh-vanity-light",
+      "domain": "fergusonhome.com",
+      "question": "3 light vanity light fixture",
+      "expected_url_pattern": "vanity-light",
+      "required_params": []
+    },
+    {
+      "id": "fh-pendant-light",
+      "domain": "fergusonhome.com",
+      "question": "pendant light for a kitchen island",
+      "expected_url_pattern": "pendant-light",
+      "required_params": []
+    },
+    {
+      "id": "fh-bathtub",
+      "domain": "fergusonhome.com",
+      "question": "freestanding bathtub",
+      "expected_url_pattern": "bathtub",
+      "required_params": []
+    },
+    {
+      "id": "fh-bathroom-faucet",
+      "domain": "fergusonhome.com",
+      "question": "widespread bathroom faucet",
+      "expected_url_pattern": "bathroom-faucet",
+      "required_params": []
+    },
+    {
+      "id": "fh-kitchen-sink",
+      "domain": "fergusonhome.com",
+      "question": "undermount stainless steel kitchen sink",
+      "expected_url_pattern": "kitchen-sink",
+      "required_params": []
+    },
+    {
+      "id": "fh-door-hardware",
+      "domain": "fergusonhome.com",
+      "question": "interior door lever handle",
+      "expected_url_pattern": "door-hardware",
+      "required_params": []
+    },
+    {
+      "id": "fh-cabinet-hardware",
+      "domain": "fergusonhome.com",
+      "question": "brushed nickel cabinet pulls",
+      "expected_url_pattern": "cabinet-hardware",
+      "required_params": []
+    },
+    {
+      "id": "fh-outdoor-light",
+      "domain": "fergusonhome.com",
+      "question": "outdoor wall lantern light",
+      "expected_url_pattern": "outdoor-lighting",
+      "required_params": []
+    },
+    {
+      "id": "fh-chandelier",
+      "domain": "fergusonhome.com",
+      "question": "chandelier for a dining room",
+      "expected_url_pattern": "chandelier",
+      "required_params": []
+    },
+    {
+      "id": "fh-floor-drain",
+      "domain": "fergusonhome.com",
+      "question": "shower floor drain",
+      "expected_url_pattern": "drain",
+      "required_params": []
+    },
+    {
+      "id": "fh-water-heater",
+      "domain": "fergusonhome.com",
+      "question": "tankless water heater",
+      "expected_url_pattern": "water-heater",
+      "required_params": []
+    },
+    {
+      "id": "fh-exhaust-fan",
+      "domain": "fergusonhome.com",
+      "question": "bathroom exhaust fan with light",
+      "expected_url_pattern": "exhaust-fan",
+      "required_params": []
+    },
+    {
+      "id": "fh-flooring-tile",
+      "domain": "fergusonhome.com",
+      "question": "porcelain floor tile",
+      "expected_url_pattern": "tile",
+      "required_params": []
+    },
+    {
+      "id": "fh-thermostat",
+      "domain": "fergusonhome.com",
+      "question": "programmable thermostat",
+      "expected_url_pattern": "thermostat",
+      "required_params": []
+    },
+    {
+      "id": "fh-range-hood",
+      "domain": "fergusonhome.com",
+      "question": "under cabinet range hood",
+      "expected_url_pattern": "range-hood",
+      "required_params": []
+    }
+  ]
+}

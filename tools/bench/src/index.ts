@@ -1,4 +1,5 @@
 export * from "./corpus.js";
+export * from "./raw-arm.js";
 export * from "./harness.js";
 export * from "./report.js";
 import { writeFileSync } from "node:fs";

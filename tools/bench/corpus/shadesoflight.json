@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "site_kind": "real",
+  "tasks": [
+    {
+      "id": "sl-chandelier",
+      "domain": "shadesoflight.com",
+      "question": "chandelier for a dining room",
+      "expected_url_pattern": "chandelier",
+      "required_params": []
+    },
+    {
+      "id": "sl-pendant",
+      "domain": "shadesoflight.com",
+      "question": "pendant light for a kitchen island",
+      "expected_url_pattern": "pendant",
+      "required_params": []
+    },
+    {
+      "id": "sl-table-lamp",
+      "domain": "shadesoflight.com",
+      "question": "table lamp for a bedroom",
+      "expected_url_pattern": "table-lamp",
+      "required_params": []
+    },
+    {
+      "id": "sl-floor-lamp",
+      "domain": "shadesoflight.com",
+      "question": "floor lamp for a living room",
+      "expected_url_pattern": "floor-lamp",
+      "required_params": []
+    },
+    {
+      "id": "sl-ceiling",
+      "domain": "shadesoflight.com",
+      "question": "flush mount ceiling light",
+      "expected_url_pattern": "ceiling",
+      "required_params": []
+    },
+    {
+      "id": "sl-sconce",
+      "domain": "shadesoflight.com",
+      "question": "wall sconce light",
+      "expected_url_pattern": "sconce",
+      "required_params": []
+    },
+    {
+      "id": "sl-vanity",
+      "domain": "shadesoflight.com",
+      "question": "bathroom vanity light",
+      "expected_url_pattern": "vanity",
+      "required_params": []
+    },
+    {
+      "id": "sl-outdoor",
+      "domain": "shadesoflight.com",
+      "question": "outdoor wall light",
+      "expected_url_pattern": "outdoor",
+      "required_params": []
+    },
+    {
+      "id": "sl-lantern",
+      "domain": "shadesoflight.com",
+      "question": "lantern pendant light",
+      "expected_url_pattern": "lantern",
+      "required_params": []
+    },
+    {
+      "id": "sl-track",
+      "domain": "shadesoflight.com",
+      "question": "track lighting kit",
+      "expected_url_pattern": "track-lighting",
+      "required_params": []
+    },
+    {
+      "id": "sl-recessed",
+      "domain": "shadesoflight.com",
+      "question": "recessed lighting trim",
+      "expected_url_pattern": "recessed",
+      "required_params": []
+    },
+    {
+      "id": "sl-fan",
+      "domain": "shadesoflight.com",
+      "question": "ceiling fan with light",
+      "expected_url_pattern": "ceiling-fan",
+      "required_params": []
+    },
+    {
+      "id": "sl-mini-pendant",
+      "domain": "shadesoflight.com",
+      "question": "mini pendant light",
+      "expected_url_pattern": "pendant",
+      "required_params": []
+    },
+    {
+      "id": "sl-desk-lamp",
+      "domain": "shadesoflight.com",
+      "question": "desk lamp",
+      "expected_url_pattern": "desk-lamp",
+      "required_params": []
+    },
+    {
+      "id": "sl-picture-light",
+      "domain": "shadesoflight.com",
+      "question": "picture light",
+      "expected_url_pattern": "picture-light",
+      "required_params": []
+    },
+    {
+      "id": "sl-under-cabinet",
+      "domain": "shadesoflight.com",
+      "question": "under cabinet lighting",
+      "expected_url_pattern": "under-cabinet",
+      "required_params": []
+    },
+    {
+      "id": "sl-crystal",
+      "domain": "shadesoflight.com",
+      "question": "crystal chandelier",
+      "expected_url_pattern": "chandelier",
+      "required_params": []
+    },
+    {
+      "id": "sl-farmhouse",
+      "domain": "shadesoflight.com",
+      "question": "farmhouse pendant light",
+      "expected_url_pattern": "pendant",
+      "required_params": []
+    },
+    {
+      "id": "sl-modern-sconce",
+      "domain": "shadesoflight.com",
+      "question": "modern wall sconce",
+      "expected_url_pattern": "sconce",
+      "required_params": []
+    },
+    {
+      "id": "sl-table-lamp-set",
+      "domain": "shadesoflight.com",
+      "question": "set of two table lamps",
+      "expected_url_pattern": "table-lamp",
+      "required_params": []
+    }
+  ]
+}
