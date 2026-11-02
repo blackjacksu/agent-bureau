@@ -1,1 +1,23 @@
-{"name":"agent-bureau","version":"0.1.0","private":true,"packageManager":"pnpm@9.15.0","engines":{"node":">=20"},"scripts":{"build":"pnpm -r build","typecheck":"pnpm -r typecheck","test":"vitest run","test:unit":"vitest run","dev":"echo dev"},"devDependencies":{"typescript":"^5.7.0","vitest":"^2.1.0"}}
+{
+  "name": "agent-bureau",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r build && vitest run",
+    "test:unit": "vitest run",
+    "dev": "echo dev",
+    "test:cov": "vitest run --coverage",
+    "lint": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "2.1.9",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,39 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: agentmap_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/agentmap_test
+      COREPACK_HOME: /tmp/corepack-home
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: corepack pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: |
+          corepack pnpm --filter @agentmap/indexer exec playwright install --with-deps chromium
+          corepack pnpm --filter @agentmap/verifier exec playwright install chromium
+      - name: Typecheck (lint gate = strict tsc)
+        run: corepack pnpm -r typecheck
+      - name: Build + all tests (incl. real pgvector integration, Chromium, dist-boot E2E)
+        run: corepack pnpm test
+      - name: Coverage gate
+        run: corepack pnpm exec vitest run --coverage
+      - name: Offers grep gate
+        run: node scripts/offers-grep-gate.mjs

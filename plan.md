@@ -987,7 +987,7 @@ This plan (revised via PR, version header bumped), ADRs, bench reports (`docs/be
 | # | Question (spec §23 + plan-found) | Blocks |
 | --- | --- | --- |
 | Q1 | Pricing tiers + per-query price; offers-as-verified-perk? (§16.4.2) | Phase 1 billing (W15); tier names §6.3 |
-| Q2 | **Which 3–5 prototype sites/categories?** | **W4 — needed before implementation starts in earnest** |
+| Q2 | **RESOLVED 2026-11-02** (ADR-0001): crawl-friendly specialists — rockauto.com (auto parts), fergusonhome.com (home improvement, Build.com successor), dermstore.com (skincare); backups 1aauto.com / wayfair.com per ADR. Robots re-checked 2026-11-02; live crawl gate in W4 is still authoritative. | W4 unblocked |
 | Q3 | Operator verification: in-house vs KYC partner? | Phase 2 (§12.4) |
 | Q4 | Event-log sharing with merchants: what, on what terms? | Phase 3 read models (§13.4); data-policy wording |
 | Q5 | UCP extension vs protocol-neutral alongside it? | Contracts evolution (§21.3) if answered late |
@@ -995,7 +995,7 @@ This plan (revised via PR, version header bumped), ADRs, bench reports (`docs/be
 | Q7 | Embedding model/provider final pick (ADR §21.4; candidate shortlist at W2) | W2/W6 |
 | Q8 | Session-state need for Streamable HTTP (R3) | Only if client behaviour forces it |
 
-None of Q1, Q3–Q8 blocks Phase 0 except Q2 (site pick) and Q7 (can default to a mainstream hosted model at W2 and ADR it). Coupon revenue questions (§16.7) block Phase 5 only.
+Q2 is resolved (ADR-0001). None of Q1, Q3–Q8 blocks Phase 0 except Q7 (can default to a mainstream hosted model at W2 and ADR it). Coupon revenue questions (§16.7) block Phase 5 only.
 
 ---
 
@@ -1006,7 +1006,7 @@ None of Q1, Q3–Q8 blocks Phase 0 except Q2 (site pick) and Q7 (can default to 
 | 0 Prototype | W1–W14 | S1–S6 (§1.2) |
 | 1 Beta | W15: self-healing at scale (already W8), `live_check` full, `my_sites`, keys, billing | 20+ builders weekly (spec §21) |
 | 2 Verified agents | §12.4 | First verified operators |
-| 3 Merchant side | §13.4 read models + dashboard | First merchants |
+| 3 Merchant side | §13.4 read models + dashboard — first slice built 2026-11-02 (admin-guarded demand/journeys APIs + `/dashboard` page; sharing terms Q4 still gate merchant-facing rollout) | First merchants |
 | 4 AgentBureau | Trust scoring over §6.3/§12.6 | Paid lookups |
 | 5 Offers (new) | §16.4–16.5 activation on opted-in domains | `offers_served`→applied rate + merchant sign-off |
 
