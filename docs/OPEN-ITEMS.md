@@ -1,6 +1,6 @@
 # Open items — what remains and exactly what unblocks each
 
-**Updated:** 2026-11-02 · **Code state:** all implementable plan items built; full suite green (see §3). These are the only remaining items. None is a code defect.
+**Updated:** 2026-11-02 (owner decisions recorded same day: ADR-0003 APPROVED; Q1/Q3/Q4 DEFERRED by owner) · **Code state:** all implementable plan items built; full suite green (see §3). These are the only remaining items. None is a code defect.
 
 ## 1. W-unit inventory (plan §20)
 
@@ -24,28 +24,36 @@
 
 ## 2. Remaining items (owner/external inputs only)
 
-### OI-1 — ADR-0003 approval
+### OI-1 — ADR-0003 approval — RESOLVED 2026-11-02
+
+**Owner decision: APPROVED.** carparts.com / shadesoflight.com / paulaschoice.com are the Phase 0 primaries.
 
 - **What:** carparts.com / shadesoflight.com / paulaschoice.com replaced the bot-walled ADR-0001 trio (all originals and backups returned `blocked: bot_protection`; no evasion attempted).
 - **Already built:** configs, corpora, live indexes (CarParts v2), benchmark reports.
 - **Decision needed:** approve, approve for Phase 0 only, or reject (then: merchant opt-in or a different egress before any re-index).
 - **When answered:** rejection requires re-indexing work only; no code change.
 
-### OI-2 — Q1 pricing
+### OI-2 — Q1 pricing — DEFERRED by owner 2026-11-02
+
+Spec §7 defaults (Free / Builder $49 / Scale $99) remain config placeholders only; no prices are enforced or charged.
 
 - **What:** tier names/prices and per-query price; whether offers are a verified-tier perk.
 - **Already built:** per-agent usage metering (`GET /api/v1/usage`), tiered rate limits, tier field on agents.
 - **Decision needed:** price points, or "defer" (defaults: spec §7 Free / Builder $49 / Scale $99 as config only).
 - **When answered:** config + ADR, ~1 PR. No schema change needed.
 
-### OI-3 — Q3 KYC provider
+### OI-3 — Q3 KYC provider — DEFERRED by owner 2026-11-02
+
+Verification stays admin-driven via the built state machine; no KYC integration started.
 
 - **What:** in-house identity check vs KYC partner for operator verification.
 - **Already built:** verification state machine + admin transition endpoint; `agent.verified` derivation; trust scoring is independent of it.
 - **Decision needed:** provider choice (and budget). 
 - **When answered:** one adapter behind the existing transition endpoint, ~1–2 PRs.
 
-### OI-4 — Q4 merchant sharing terms
+### OI-4 — Q4 merchant sharing terms — DEFERRED by owner 2026-11-02
+
+Merchant read models and dashboard remain admin-token only.
 
 - **What:** what event-log data merchants see, on what terms.
 - **Already built:** demand/journey read models + dashboard, currently admin-token only precisely because terms are unset.

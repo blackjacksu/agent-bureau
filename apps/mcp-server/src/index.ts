@@ -23,5 +23,5 @@ const isMain = import.meta.url === `file://${process.argv[1]}`;
 if (isMain) {
   const { cfg, app } = buildFromEnv();
   app.server.listen(cfg.MCP_PORT, () => console.log(JSON.stringify({ level: "info", service: "mcp-server", msg: "listening", port: cfg.MCP_PORT })));
-  const shutdown = () => app.server.close(() => process.exit(0)); process.on("SIGTERM", shutdown); process.on("SIGINT", shutdown); setTimeout(() => process.exit(0), 10_000).unref();
+  const shutdown = () => app.server.close(() => process.exit(0)); process.on("SIGTERM", shutdown); process.on("SIGINT", shutdown);
 }

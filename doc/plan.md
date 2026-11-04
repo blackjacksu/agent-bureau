@@ -986,10 +986,10 @@ This plan (revised via PR, version header bumped), ADRs, bench reports (`docs/be
 
 | # | Question (spec §23 + plan-found) | Blocks |
 | --- | --- | --- |
-| Q1 | Pricing tiers + per-query price; offers-as-verified-perk? (§16.4.2) | Phase 1 billing (W15); tier names §6.3 |
+| Q1 | Pricing — **DEFERRED by owner 2026-11-02**; spec §7 defaults remain config placeholders, nothing charged | Phase 1 billing (W15) when revisited |
 | Q2 | **RESOLVED 2026-11-02** (ADR-0001): crawl-friendly specialists — rockauto.com (auto parts), fergusonhome.com (home improvement, Build.com successor), dermstore.com (skincare); backups 1aauto.com / wayfair.com per ADR. Robots re-checked 2026-11-02; live crawl gate in W4 is still authoritative. | W4 unblocked |
-| Q3 | Operator verification: in-house vs KYC partner? | Phase 2 (§12.4) |
-| Q4 | Event-log sharing with merchants: what, on what terms? | Phase 3 read models (§13.4); data-policy wording |
+| Q3 | KYC provider — **DEFERRED by owner 2026-11-02**; verification stays admin-driven | Phase 2 (§12.4) when revisited |
+| Q4 | Merchant sharing terms — **DEFERRED by owner 2026-11-02**; read models stay admin-only | Phase 3 rollout when revisited |
 | Q5 | UCP extension vs protocol-neutral alongside it? | Contracts evolution (§21.3) if answered late |
 | Q6 | Browser extension worth privacy/review cost? (also C7 interaction) | Post-Phase 2 at earliest |
 | Q7 | Embedding model/provider final pick (ADR §21.4; candidate shortlist at W2) | W2/W6 |

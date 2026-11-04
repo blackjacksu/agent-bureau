@@ -31,13 +31,13 @@ pnpm monorepo (Node ≥20, pnpm 9). Postgres+pgvector via `docker-compose.yml`; 
 ## Planning documents
 
 - `agentmap-proposal-and-spec.md` — Proposal + Design Spec v0.1 (§§1–23): problem, goals/non-goals, system overview, data model, MCP tools, core flows, freshness, compliance, benchmark plan, roadmap.
-- `plan.md` — Implementation plan v0.2 (§§1–23 + appendices): success criteria S1–S6, locked decisions, architecture, repo layout (§4), data model, per-app specs, coupon seam (§16), testing/benchmark/validation gates (§§17–19), work plan W1–W15 (§20). Check a step's entry/exit criteria here before implementing it.
+- `doc/plan.md` — Implementation plan v0.2 (§§1–23 + appendices): success criteria S1–S6, locked decisions, architecture, repo layout (§4), data model, per-app specs, coupon seam (§16), testing/benchmark/validation gates (§§17–19), work plan W1–W15 (§20). Check a step's entry/exit criteria here before implementing it.
 
 ## What is being built
 
 **AgentMap**: a hosted, shared, pre-built map of how to use websites, served to AI agents over MCP. The first agent to need a site pays the discovery cost; later agents get a short, cheap answer. Phase 0 MCP tools: `is_mapped`, `find`, `get_path`, `live_check`, `report_outcome`, `request_mapping`, `my_sites`.
 
-## Locked decisions (plan.md §2 — changing any requires an ADR + plan revision, not a silent code change)
+## Locked decisions (doc/plan.md §2 — changing any requires an ADR + plan revision, not a silent code change)
 
 - **D1** TypeScript on Node.js LTS everywhere in Phase 0–1. No Rust until a profile triggers it (plan §2.2: indexer CPU saturation → live-verifier latency → `find` p99).
 - **D2** Remote hosted MCP over Streamable HTTP, single `/mcp` endpoint (POST + GET), MCP spec 2025-03-26. Not stdio.

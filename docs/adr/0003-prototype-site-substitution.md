@@ -1,6 +1,6 @@
 # ADR-0003: Prototype site substitution after live crawl gate
 
-**Status:** Accepted · **Date:** 2026-11-02 · **Supersedes:** ADR-0001 primary list (strategy unchanged)
+**Status:** Accepted — owner-approved 2026-11-02 · **Date:** 2026-11-02 · **Supersedes:** ADR-0001 primary list (strategy unchanged)
 
 ## Context
 
