@@ -33,16 +33,40 @@ export class MatchingService {
     const site = await this.repo.getSite(domain);
     if (!site || site.status !== "mapped") return { mapped: false as const, status: site?.status ?? "queued" };
     const norm = normalizeQuestion(questionRaw);
-    const [nodes, edges] = await Promise.all([this.repo.listNodes(domain), this.repo.listEdges(domain)]);
-    const liveNodes = nodes.filter((n) => !n.stale); const liveEdges = edges.filter((e) => !e.stale);
-    const edgeById = new Map(liveEdges.map((e) => [e.id, e])); const nodeById = new Map(liveNodes.map((n) => [n.id, n]));
-    // First pass extraction with all edges to canonicalize (schema refined per-path later)
-    const prelim = extractParams(norm.text, liveEdges, this.aliases);
+    // Param schemas for canonicalization. Edge rows carry no vectors, so this
+    // stays a full fetch; the vector-heavy node/path_cache scans go bounded below.
+    const schemaEdges = await this.repo.listEdges(domain);
+    const prelim = extractParams(norm.text, schemaEdges.filter((e) => !e.stale), this.aliases);
     const canonical = canonicalQuestion(norm.text, prelim.params);
     const qEmb = await this.embeddings.embed(canonical || norm.lower);
-    // PathCache first
-    if (this.repo.listPathCache) {
-      const ranked = await rankPathCache(this.embeddings, qEmb, await this.repo.listPathCache(domain));
+    // Bounded retrieval when the repo supports it: HNSW top-k nodes plus the
+    // edges around them, instead of parsing every 1536-d vector per query.
+    // Falls back to full scans (empty top-k included, e.g. before backfill).
+    let liveNodes: MatchingNode[];
+    let liveEdges: MatchingEdge[];
+    if (this.repo.searchNodes) {
+      const searched = await this.repo.searchNodes(domain, qEmb, 24, canonical || norm.text);
+      const nodes = searched.length ? searched : await this.repo.listNodes(domain);
+      liveNodes = nodes.filter((n) => !n.stale);
+      const ids = liveNodes.map((n) => n.id);
+      const fetched = this.repo.listEdgesForNodes
+        ? await this.repo.listEdgesForNodes(domain, ids)
+        : schemaEdges;
+      liveEdges = fetched.filter((e) => !e.stale);
+    } else {
+      const nodes = await this.repo.listNodes(domain);
+      liveNodes = nodes.filter((n) => !n.stale);
+      liveEdges = schemaEdges.filter((e) => !e.stale);
+    }
+    const edgeById = new Map(liveEdges.map((e) => [e.id, e])); const nodeById = new Map(liveNodes.map((n) => [n.id, n]));
+    // PathCache first (bounded HNSW top-k when available, else full scan)
+    const cacheEntries = this.repo.searchPathCache
+      ? await this.repo.searchPathCache(domain, qEmb, 3)
+      : this.repo.listPathCache
+        ? await this.repo.listPathCache(domain)
+        : undefined;
+    if (cacheEntries) {
+      const ranked = await rankPathCache(this.embeddings, qEmb, cacheEntries);
       for (const hit of ranked) {
         if (hit.similarity < this.cfg.cacheAccept) continue;
         const pathEdges = hit.entry.ordered_edge_ids.map((id) => edgeById.get(id));

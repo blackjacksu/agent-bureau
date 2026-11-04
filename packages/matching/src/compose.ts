@@ -9,17 +9,25 @@ export function composePath(nodes: MatchingNode[], edges: MatchingEdge[], fromId
   const adj = new Map<string, MatchingEdge[]>();
   for (const e of edges.filter((x) => !x.stale)) { if (!adj.has(e.from_node_id)) adj.set(e.from_node_id, []); adj.get(e.from_node_id)!.push(e); }
   for (const list of adj.values()) list.sort((a, b) => edgeWeight(a) - edgeWeight(b));
-  type State = { id: string; via: MatchingEdge[]; cost: number };
-  const best = new Map<string, number>(); const queue: State[] = fromIds.map((id) => ({ id, via: [], cost: 0 }));
-  for (const id of fromIds) best.set(id, 0);
-  while (queue.length) {
-    queue.sort((a, b) => a.cost - b.cost || a.via.length - b.via.length);
-    const cur = queue.shift()!;
+  type State = { id: string; via: MatchingEdge[]; cost: number; seq: number };
+  // Binary heap ordered by (cost, hops, insertion order): same pick order as the old stable sort, without O(n^2 log n) re-sorting.
+  const heap: State[] = []; let seq = 0;
+  const less = (a: State, b: State) => a.cost - b.cost || a.via.length - b.via.length || a.seq - b.seq;
+  const push = (st: State) => { let i = heap.push(st) - 1; while (i > 0) { const p = (i - 1) >> 1; if (!less(heap[i]!, heap[p]!)) break; [heap[i], heap[p]] = [heap[p]!, heap[i]!]; i = p; } };
+  const pop = (): State => {
+    const top = heap[0]!; const last = heap.pop()!;
+    if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && less(heap[l]!, heap[m]!)) m = l; if (r < heap.length && less(heap[r]!, heap[m]!)) m = r; if (m === i) break; [heap[i], heap[m]] = [heap[m]!, heap[i]!]; i = m; } }
+    return top;
+  };
+  const best = new Map<string, number>();
+  for (const id of fromIds) { push({ id, via: [], cost: 0, seq: seq++ }); best.set(id, 0); }
+  while (heap.length) {
+    const cur = pop();
     if (cur.id === targetId) return cur.via;
     if (cur.via.length >= maxHops) continue;
     for (const e of adj.get(cur.id) ?? []) {
       const cost = cur.cost + edgeWeight(e);
-      if (cost < (best.get(e.to_node_id) ?? Infinity) - 1e-9) { best.set(e.to_node_id, cost); queue.push({ id: e.to_node_id, via: [...cur.via, e], cost }); }
+      if (cost < (best.get(e.to_node_id) ?? Infinity) - 1e-9) { best.set(e.to_node_id, cost); push({ id: e.to_node_id, via: [...cur.via, e], cost, seq: seq++ }); }
     }
   }
   return null;

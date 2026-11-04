@@ -14,6 +14,7 @@
   "dependencies": {
     "@agentmap/contracts": "workspace:*",
     "@agentmap/db": "workspace:*",
+    "@agentmap/matching": "workspace:*",
     "playwright": "1.49.0",
     "zod": "^3.23.0"
   },

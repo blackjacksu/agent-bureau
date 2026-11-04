@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { DbClient } from "@agentmap/db";
 import { findKeysByPrefix, touchApiKey, enqueueJob } from "@agentmap/db";
+import { lexicalTokens } from "@agentmap/matching";
 import { normalizeDomain } from "./config.js";
 
 export interface SiteRow { domain: string; status: string; map_version: number; last_indexed_at: string | null; offers_enabled?: boolean }
@@ -18,6 +19,12 @@ export interface Store {
   queuePosition(domain: string): Promise<number | null>;
   listNodes(domain: string): Promise<NodeRow[]>;
   listEdges(domain: string): Promise<EdgeRow[]>;
+  /** HNSW top-k + lexical matches on queryText + entry nodes. Absent => callers use listNodes. */
+  searchNodes?(domain: string, embedding: number[], limit?: number, queryText?: string): Promise<NodeRow[]>;
+  /** Edges touching the given node ids. Absent => callers use listEdges. */
+  listEdgesForNodes?(domain: string, nodeIds: string[]): Promise<EdgeRow[]>;
+  /** HNSW top-k path-cache rows. Absent => callers use listPathCache. */
+  searchPathCache?(domain: string, embedding: number[], limit?: number): Promise<PathCacheRow[]>;
   createPath(domain: string, canonical: string, edgeIds: string[]): Promise<PathRecord>;
   listPathCache?(domain: string): Promise<PathCacheRow[]>;
   recordPathCacheHit?(id: string): Promise<void>;
@@ -41,6 +48,7 @@ export interface Store {
 }
 export function outcomeHash(success: boolean, failed?: number) { return createHash("sha256").update(`${success}:${failed ?? ""}`).digest("hex"); }
 function iso(v: unknown): string | null { if (!v) return null; return v instanceof Date ? v.toISOString() : String(v); }
+function escapeLike(s: string) { return s.replace(/[\\%_]/g, (m) => `\\${m}`); }
 
 export class InMemoryStore implements Store {
   sites = new Map<string, SiteRow>(); nodes: NodeRow[] = []; edges: EdgeRow[] = [];
@@ -109,6 +117,50 @@ export class PgStore implements Store {
   async queuePosition(domain: string) { const r = await this.db.query(`SELECT domain, demand_score FROM site WHERE status='queued' ORDER BY demand_score DESC, domain ASC`); const i = r.rows.findIndex((x: any) => x.domain === domain); return i >= 0 ? i + 1 : null; }
   async listNodes(domain: string) { const s = await this.getSite(domain); if (!s) return []; const r = await this.db.query(`SELECT * FROM node WHERE domain=$1 AND map_version=$2 AND stale=false`, [domain, s.map_version]); return r.rows; }
   async listEdges(domain: string) { const s = await this.getSite(domain); if (!s) return []; const r = await this.db.query(`SELECT * FROM edge WHERE domain=$1 AND map_version=$2`, [domain, s.map_version]); return r.rows.map((e: any) => ({ ...e, selector_fallbacks: e.selector_fallbacks ?? [] })); }
+  toVectorParam(embedding: number[]) { return `[${embedding.join(",")}]`; }
+  async searchNodes(domain: string, embedding: number[], limit = 24, queryText = "") {
+    const s = await this.getSite(domain); if (!s) return [];
+    const vec = this.toVectorParam(embedding);
+    const lim = Math.max(1, Math.floor(limit));
+    const seen = new Map<string, NodeRow>();
+    const add = (rows: NodeRow[]) => { for (const n of rows) if (!seen.has(n.id)) seen.set(n.id, n); };
+    const v = await this.db.query(
+      `SELECT * FROM node WHERE domain=$1 AND map_version=$2 AND stale=false AND embedding IS NOT NULL ORDER BY embedding <=> $3::vector LIMIT $4`,
+      [domain, s.map_version, vec, lim]);
+    add(v.rows);
+    // Lexical half of the JS blend: pure-vector top-k misses nodes whose rank
+    // comes from token overlap (common with weak/token-hash embeddings).
+    const toks = lexicalTokens(queryText).slice(0, 8);
+    if (toks.length) {
+      const conds = toks.map((_, i) => `(url_pattern ILIKE $${i + 3} ESCAPE '\\' OR description ILIKE $${i + 3} ESCAPE '\\')`);
+      const likeParams = toks.map((t) => `%${escapeLike(t)}%`);
+      const rows = await this.db.query(
+        `SELECT * FROM node WHERE domain=$1 AND map_version=$2 AND stale=false AND (${conds.join(" OR ")}) LIMIT $${likeParams.length + 3}`,
+        [domain, s.map_version, ...likeParams, lim]);
+      add(rows.rows);
+    }
+    // Entry nodes anchor path composition; they rarely rank top-k on their own.
+    const entry = await this.db.query(
+      `SELECT * FROM node WHERE domain=$1 AND map_version=$2 AND stale=false AND kind IN ('home','search')`,
+      [domain, s.map_version]);
+    add(entry.rows);
+    return [...seen.values()];
+  }
+  async listEdgesForNodes(domain: string, nodeIds: string[]) {
+    if (!nodeIds.length) return [];
+    const s = await this.getSite(domain); if (!s) return [];
+    const r = await this.db.query(
+      `SELECT id, domain, map_version, from_node_id, to_node_id, action, selector, selector_fallbacks, url_template, params_schema, attempts, successes, stale FROM edge WHERE domain=$1 AND map_version=$2 AND (from_node_id = ANY($3::uuid[]) OR to_node_id = ANY($3::uuid[]))`,
+      [domain, s.map_version, nodeIds]);
+    return r.rows.map((e: any) => ({ ...e, selector_fallbacks: e.selector_fallbacks ?? [] }));
+  }
+  async searchPathCache(domain: string, embedding: number[], limit = 3) {
+    const vec = this.toVectorParam(embedding);
+    const r = await this.db.query(
+      `SELECT * FROM path_cache WHERE domain=$1 AND stale=false AND question_embedding IS NOT NULL ORDER BY question_embedding <=> $2::vector LIMIT $3`,
+      [domain, vec, limit]);
+    return r.rows.map((x: any) => ({ id: x.id, domain: x.domain, question_canonical: x.question_canonical, question_embedding: x.question_embedding, ordered_edge_ids: x.ordered_edge_ids, stale: !!x.stale, last_success_at: iso(x.last_success_at), hits: x.hits }));
+  }
   async createPath(domain: string, canonical: string, edgeIds: string[]) { const r = await this.db.query(`INSERT INTO path_cache(domain,question_canonical,ordered_edge_ids) VALUES($1,$2,$3) RETURNING *`, [domain, canonical, edgeIds]); return { id: r.rows[0].id, domain, ordered_edge_ids: edgeIds, stale: !!r.rows[0].stale }; }
   async getPath(id: string) { const raw = id.replace(/^p_/, ""); const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(raw) ? raw : null; if (!uuid) return null; const r = await this.db.query(`SELECT * FROM path_cache WHERE id=$1`, [uuid]); const p = r.rows[0]; return p ? { id: p.id, domain: p.domain, ordered_edge_ids: p.ordered_edge_ids, stale: !!p.stale } : null; }
   async isDuplicateOutcome(agentId: string, pathId: string, h: string) { const raw = pathId.replace(/^p_/, ""); if (!/^[0-9a-f-]{36}$/i.test(raw)) return false; const r = await this.db.query(`SELECT 1 FROM event WHERE agent_id=$1 AND path_id=$2 AND type='outcome' AND metadata->>'outcome_hash'=$3 AND created_at>now()-interval '10 minutes' LIMIT 1`, [agentId, raw, h]); return r.rows.length > 0; }

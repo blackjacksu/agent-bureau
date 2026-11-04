@@ -8,7 +8,7 @@ Living record per plan §21.5. Updated when a domain is indexed, re-indexed, or 
 | fergusonhome.com | Home improvement | ADR-0001 primary | — (superseded by ADR-0003) | — | — | Bounded live crawl 2026-11-02: `blocked: bot_protection`. Superseded by shadesoflight.com per ADR-0003 |
 | dermstore.com | Skincare | ADR-0001 primary | — (superseded by ADR-0003) | — | — | Bounded live crawl 2026-11-02: `blocked: bot_protection`. Superseded by paulaschoice.com per ADR-0003 |
 | carparts.com | Auto parts | ADR-0003 primary | 2 | 2026-11-02 | — | Indexed live (7,475 nodes); Arm B 20/20 found, 18/20 pattern hit |
-| shadesoflight.com | Home improvement | ADR-0003 primary | 1 | 2026-11-02 | — | Indexed live (233 nodes); Arm B 20/20 found, 15/20 pattern hit |
+| shadesoflight.com | Home improvement | ADR-0003 primary | 2 | 2026-11-04 | — | Re-indexed with sitemap seeding (Angle 3), 300-page cap: 2,702 nodes / 34,845 edges (v1 was 233). Nomic embeddings. Arm B 20/20 found, 16/20 pattern hit; `find` ~160 ms cold (hub-heavy graph: ~3.6k edges fetched per query) |
 | paulaschoice.com | Skincare | ADR-0003 primary | 1 | 2026-11-02 | — | Indexed live; Arm B 19/20 found, 13/20 pattern hit |
 | mini-auto.example | Fixture | plan §17.6 | 1 (fixture) | fixture | — | Test-only fixture site |
 | shop.example | Fixture | mcp-server tests | 1 (fixture) | fixture | — | In-memory fixture graph |

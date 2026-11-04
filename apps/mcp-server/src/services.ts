@@ -22,6 +22,9 @@ export function storeToMatchingRepo(store: Store): MatchingRepository {
     getSite: (d:string)=>store.getSite(d),
     listNodes: async (d:string)=>(await store.listNodes(d)).map((n:any)=>({...n, embedding: parseVector(n.embedding)})),
     listEdges: (d:string)=>store.listEdges(d) as any,
+    searchNodes: s.searchNodes ? async (d:string, emb:number[], limit?:number, q?:string)=>(await s.searchNodes(d, emb, limit, q)).map((n:any)=>({...n, embedding: parseVector(n.embedding)})) : undefined,
+    listEdgesForNodes: s.listEdgesForNodes ? (d:string, ids:string[])=>s.listEdgesForNodes(d, ids) as any : undefined,
+    searchPathCache: s.searchPathCache ? async (d:string, emb:number[], limit?:number)=>(await s.searchPathCache(d, emb, limit)).map((x:any)=>({...x, question_embedding: parseVector(x.question_embedding)})) : undefined,
     listPathCache: s.listPathCache ? (d:string)=>s.listPathCache(d) : undefined,
     recordPathCacheHit: s.recordPathCacheHit ? (id:string)=>s.recordPathCacheHit(id) : undefined,
     upsertPathCache: s.upsertPathCache ? (input:any)=>s.upsertPathCache(input) : undefined,
@@ -52,7 +55,31 @@ import { metrics as globalMetrics, type MetricsRegistry } from "./observability.
 export type CorroboratorPort = (args: { domain: string; path_id: string; url?: string }) => Promise<boolean>;
 export class Services {
   readonly feedback = new FeedbackTracker();
+  /** Short-TTL find cache keyed by domain + map_version + normalized question.
+   *  Version-keying plus the 60s TTL is what invalidates across processes
+   *  (indexer publish bumps map_version); in-process staleness also clears
+   *  via clearFindCache in reportOutcome/healBranch. */
+  private findCache = new Map<string, { expires: number; value: any }>();
   constructor(private store: Store, private events: EventSink, private opts: { verifier: VerifierPort; matching?: MatchingPort; offers?: OffersPort; offersEnabled?: boolean; abstain?: number; corroborator?: CorroboratorPort; metrics?: MetricsRegistry }) {}
+  clearFindCache(domain?: string) {
+    if (!domain) { this.findCache.clear(); return; }
+    const p = `${domain}\n`;
+    for (const k of this.findCache.keys()) if (k.startsWith(p)) this.findCache.delete(k);
+  }
+  private readFindCache(key: string) {
+    const hit = this.findCache.get(key);
+    if (!hit) return undefined;
+    if (hit.expires <= Date.now()) { this.findCache.delete(key); return undefined; }
+    return hit.value;
+  }
+  private writeFindCache(key: string, value: any) {
+    if (this.findCache.size > 1000) {
+      const now = Date.now();
+      for (const [k, v] of this.findCache) if (v.expires <= now) this.findCache.delete(k);
+      if (this.findCache.size > 1000) this.findCache.clear();
+    }
+    this.findCache.set(key, { expires: Date.now() + 60_000, value });
+  }
   private m() { return this.opts.metrics ?? globalMetrics; }
   private siteOut(s: any) { return { mapped: s.status === "mapped", map_version: s.status === "mapped" ? s.map_version : null, last_indexed_at: s.last_indexed_at ?? null, status: s.status }; }
   async isMapped(agentId: string, input: { domain: string }) {
@@ -66,6 +93,13 @@ export class Services {
     const domain = normalizeDomain(input.domain); const site = await this.store.getSite(domain);
     if (site && (site.status === "opted_out" || site.status === "blocked")) throw new AgentMapError("domain_blocked", `domain ${domain} is blocked`);
     if (!site || site.status !== "mapped") { await this.store.recordDemand(domain, agent.agentId, "find_miss"); const s = await this.store.getSite(domain); this.events.write({ agent_id: agent.agentId, domain, type: "query", question_hash: hashQuestion(input.question.toLowerCase()), metadata: {} }); return { mapped: false, status: s?.status ?? "queued", queue_position: await this.store.queuePosition(domain) }; }
+    const cacheKey = `${domain}\n${site.map_version}\n${input.question.toLowerCase().trim()}`;
+    const cached = this.readFindCache(cacheKey);
+    if (cached) {
+      this.events.write({ agent_id: agent.agentId, domain, type: "query", question_hash: hashQuestion(input.question.toLowerCase()), metadata: {} });
+      this.events.write({ agent_id: agent.agentId, domain, type: "path_used", path_id: parseUuid(String(cached.path_id ?? "")), metadata: {} });
+      return cached;
+    }
     const matching = this.opts.matching ?? new DefaultMatching();
     const result: any = await matching.find(this.store, domain, input.question);
     if (!result) return { mapped: false, status: site.status, queue_position: await this.store.queuePosition(domain) };
@@ -77,7 +111,9 @@ export class Services {
       this.events.write({ agent_id: agent.agentId, domain, type: "query", question_hash: hashQuestion(_canonical ?? input.question.toLowerCase()), metadata: {} });
       this.events.write({ agent_id: agent.agentId, domain, type: "path_used", path_id: parseUuid(String(rest.path_id ?? "")), metadata: {} });
       if (offers.length) this.events.write({ agent_id: agent.agentId, domain, type: "offers_served", metadata: { offer_ids: offers.map((o) => o.offer_id), domain, via: "find" } });
-      return { ...rest, offers };
+      const out = { ...rest, offers };
+      this.writeFindCache(cacheKey, out);
+      return out;
     }
     this.events.write({ agent_id: agent.agentId, domain, type: "query", question_hash: hashQuestion(input.question.toLowerCase()), metadata: {} });
     return result;
@@ -128,6 +164,7 @@ export class Services {
     }
     // Weight 0 (capped/decayed) agents: ack but do not count (11.3 separates feedback from query privilege).
     const res = counted && weight > 0 ? await this.store.recordOutcome({ path, success: input.success, failedStepIndex: input.failed_step_index, agentVerified: agent.verified, weight, corroboratedBroken }) : { branch_status: "ok" as const, duplicate: false };
+    if (res.branch_status === "marked_stale") this.clearFindCache(domain);
     await this.store.rememberOutcome(agent.agentId, input.path_id, h);
     if (input.note) await this.store.saveFeedbackNote(agent.agentId, input.path_id, input.note);
     this.events.write({ agent_id: agent.agentId, domain, type: "outcome", path_id: parseUuid(input.path_id), metadata: { success: input.success } });
@@ -135,7 +172,7 @@ export class Services {
     return { acknowledged: true as const, branch_status: res.branch_status };
   }
   /** Recovery (11.2): reindex publish healed the branch — clear stale so find serves it again. */
-  async healBranch(path_id: string) { const path = await this.store.getPath(path_id); if (path && this.store.clearStaleForEdges) await this.store.clearStaleForEdges(path.ordered_edge_ids); }
+  async healBranch(path_id: string) { const path = await this.store.getPath(path_id); if (path) { if (this.store.clearStaleForEdges) await this.store.clearStaleForEdges(path.ordered_edge_ids); this.clearFindCache(path.domain); } }
   async requestMapping(agent: { agentId: string }, input: { domain: string }) {
     const domain = normalizeDomain(input.domain); const site = await this.store.getSite(domain);
     if (site?.status === "mapped") return { queued: false, queue_position: null, already_mapped: true };

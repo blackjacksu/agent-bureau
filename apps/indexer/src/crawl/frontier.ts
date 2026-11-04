@@ -3,6 +3,7 @@ import { parseRobots, evaluateGate, detectBotWall, isRobotsAllowed, type ParsedR
 import { buildGraph, validateGraph, type BuiltGraph } from "../emit/graph-builder.js";
 import type { PageFetcher } from "./browser-pool.js";
 import type { PageSnapshot } from "../discover/page.js";
+import { discoverSitemapUrls } from "./sitemap.js";
 import { resolveLimits, type SiteConfig } from "../sites/site-config.js";
 
 export interface EmbedPort { embed(text: string): Promise<number[]>; model?: string }
@@ -58,6 +59,14 @@ export async function crawlSite(config: SiteConfig, baseUrl: string, deps: Crawl
   };
   enqueue(baseUrl, 0, 0);
   for (const s of config.seedUrls) enqueue(new URL(s, origin).toString(), 0, 1);
+  // Sitemap seeding (Angle 3): diverse URLs at depth 1, after link-discovered depth-1 pages, within maxPages.
+  if (config.useSitemap !== false && deps.fetcher.fetchText) {
+    try {
+      const ft = deps.fetcher.fetchText.bind(deps.fetcher);
+      const found = await discoverSitemapUrls(ft, origin, robots?.sitemaps ?? [], { maxUrls: config.sitemapMaxUrls ?? 300, sleep, delayMs: delayMs });
+      found.forEach((u, i) => enqueue(u, 1, 1000 + i));
+    } catch { /* sitemap discovery is best-effort */ }
+  }
 
   const fetchWithRetries = async (url: string): Promise<PageSnapshot> => {
     let lastErr: unknown;

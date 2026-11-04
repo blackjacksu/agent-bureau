@@ -22,6 +22,8 @@ export interface SiteConfig {
   limitOverrides?: Partial<CrawlLimits>;
   searchParam?: string; // query param for search template, default "q"
   vehiclePicker?: boolean;
+  useSitemap?: boolean; // seed the frontier from sitemap(s); default true
+  sitemapMaxUrls?: number; // diverse sample size, default 300
   notes: string; // quirks log, dated
 }
 

@@ -27,23 +27,28 @@ export class FakeEmbeddingProvider implements EmbeddingProvider {
 }
 export class HostedEmbeddingProvider implements EmbeddingProvider {
   model: string; dims = 1536;
-  constructor(private opts: { apiKey: string; model?: string; baseUrl?: string; fetchFn?: typeof fetch }) {
+  constructor(private opts: { apiKey: string; model?: string; baseUrl?: string; dims?: number; padTo?: number; fetchFn?: typeof fetch }) {
     this.model = opts.model ?? "text-embedding-3-small";
   }
   async embed(text: string): Promise<number[]> {
     const f = this.opts.fetchFn ?? fetch;
     const base = (this.opts.baseUrl ?? "https://api.openai.com/v1").replace(/\/$/, "");
-    const res = await f(`${base}/embeddings`, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${this.opts.apiKey}` }, body: JSON.stringify({ model: this.model, input: text }) });
+    const res = await f(`${base}/embeddings`, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${this.opts.apiKey}` }, body: JSON.stringify({ model: this.model, input: text, ...(this.opts.dims ? { dimensions: this.opts.dims } : {}) }) });
     if (!res.ok) throw Object.assign(new Error(`embedding provider ${res.status}`), { code: "upstream_error" });
     const j: any = await res.json();
     const vec = j?.data?.[0]?.embedding;
     if (!Array.isArray(vec)) throw Object.assign(new Error("embedding provider bad response"), { code: "upstream_error" });
-    this.dims = vec.length; return vec.map(Number);
+    const out = vec.map(Number);
+    // Zero-padding keeps cosine similarity identical while fitting the fixed vector(1536) column.
+    const pad = this.opts.padTo;
+    if (pad && out.length > pad) throw Object.assign(new Error(`embedding dims ${out.length} exceed EMBEDDING_PAD_TO ${pad}`), { code: "upstream_error" });
+    if (pad) while (out.length < pad) out.push(0);
+    this.dims = out.length; return out;
   }
 }
 export function createEmbeddingProviderFromEnv(env: Record<string, string | undefined> = process.env): EmbeddingProvider {
   const key = env.EMBEDDING_API_KEY;
-  if (key && env.EMBEDDING_PROVIDER && env.EMBEDDING_PROVIDER !== "fake") return new HostedEmbeddingProvider({ apiKey: key, model: env.EMBEDDING_MODEL });
+  if (key && env.EMBEDDING_PROVIDER && env.EMBEDDING_PROVIDER !== "fake") return new HostedEmbeddingProvider({ apiKey: key, model: env.EMBEDDING_MODEL, baseUrl: env.EMBEDDING_BASE_URL || undefined, dims: env.EMBEDDING_DIMS ? Number(env.EMBEDDING_DIMS) : undefined, padTo: env.EMBEDDING_PAD_TO ? Number(env.EMBEDDING_PAD_TO) : undefined });
   return new FakeEmbeddingProvider();
 }
 export function parseVector(v: unknown): number[] | null {

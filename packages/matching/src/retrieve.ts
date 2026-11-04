@@ -14,10 +14,33 @@ export function tokenOverlap(queryText: string, n: MatchingNode): number {
   return hit / q.size;
 }
 export interface PathCacheEntry { id: string; domain: string; question_canonical: string; question_embedding?: number[] | null; ordered_edge_ids: string[]; stale?: boolean; last_success_at?: string | null; hits?: number }
+/** Candidate-generation tokens for DB-level lexical pre-filter: stemmed,
+ * stopword-free, length>2. Mirrors the lexical half of rankNodes blending. */
+export function lexicalTokens(text: string): string[] {
+  return [...new Set(tokenize(text).map(stem).filter((t) => !STOP.has(t) && t.length > 2))];
+}
 export interface MatchingRepository {
   getSite(domain: string): Promise<{ domain: string; status: string; map_version: number } | null>;
   listNodes(domain: string): Promise<MatchingNode[]>;
   listEdges(domain: string): Promise<import("./compose.js").MatchingEdge[]>;
+  /**
+   * Bounded candidate search: top matches by embedding similarity UNION
+   * lexical (ILIKE) matches on queryText, plus entry (home/search) nodes so
+   * path composition has a start. The union must cover both halves of the
+   * rankNodes blend (0.75 cosine + 0.25 token overlap), or lexically-strong
+   * targets are cut before JS re-ranking. Absent => find() falls back to
+   * listNodes + JS ranking.
+   */
+  searchNodes?(domain: string, embedding: number[], limit?: number, queryText?: string): Promise<MatchingNode[]>;
+  /**
+   * Bounded path-cache lookup: top matches by question-embedding similarity.
+   * Absent => find() falls back to listPathCache + JS ranking.
+   */
+  searchPathCache?(domain: string, embedding: number[], limit?: number): Promise<PathCacheEntry[]>;
+  /**
+   * Bounded edge fetch for a node-id set. Absent => find() falls back to listEdges.
+   */
+  listEdgesForNodes?(domain: string, nodeIds: string[]): Promise<import("./compose.js").MatchingEdge[]>;
   listPathCache?(domain: string): Promise<PathCacheEntry[]>;
   recordPathCacheHit?(id: string): Promise<void>;
   upsertPathCache?(input: { domain: string; question_canonical: string; question_embedding: number[]; ordered_edge_ids: string[]; param_bindings: Record<string, unknown> }): Promise<{ id: string }>;
