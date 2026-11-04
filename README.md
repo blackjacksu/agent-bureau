@@ -4,7 +4,19 @@
 
 Raw browsing is what personal agents do today (see [Research](#research-how-personal-agents-use-websites-today)): open a browser, read screenshots/DOM/HTML, guess the next click, repeat. That costs 10⁴–10⁵ tokens per page and fails often. AgentMap pays the crawl cost **once**, stores *how the site works* (categories, search, filters, URL templates — never cached prices), and serves every later agent a ~250-token answer in milliseconds. Prices and stock are always re-checked live.
 
+| Per product search | Raw agent browsing | Via AgentMap |
+| --- | --- | --- |
+| Tokens | ~83k–313k | ~250 |
+| Time | ~200–300 ms cold | ~8–16 ms |
+| Success | 52–55% | 68–77% |
+
+Measured on 60 real shopping tasks — full report: [docs/bench/2026-11-04-speed.md](docs/bench/2026-11-04-speed.md). Token counts are `ceil(chars/4)` estimates, so read them as "~250 vs ~80k+".
+
 > Status: working Phase-0 prototype. 3 live-indexed sites, 387 tests passing, benchmarked against naive and optimized crawlers. Not production-hosted yet.
+
+![AgentMap flow: crawl once, share the map — the L1 cache for agent commerce](docs/demo/flow.svg)
+
+Rehearsing a demo? See the [60-second cache talk](docs/demo/LIVE-DEMO-SCRIPT.md).
 
 ## Quick start (local)
 
@@ -77,7 +89,6 @@ Cursor / any Streamable-HTTP MCP client (`mcp.json`):
 | `report_outcome` | Agent reports success/failure — this is how the map self-heals |
 | `request_mapping` | Ask for an unmapped site to be crawled and indexed |
 | `my_sites` | List/inspect sites this agent has used |
-| `find_offers` | *(flag-gated, off by default)* Public/merchant coupons — see [Coupon mining](docs/demo/COUPON-MINING.md) |
 
 REST mirrors exist under `/api/v1/*` (e.g. `POST /api/v1/find`) for non-MCP clients and for the dashboard.
 
@@ -90,14 +101,14 @@ curl -s localhost:8080/api/v1/find -H "Authorization: Bearer am_live_<key>" \
   -d '{"domain":"shadesoflight.com","question":"chandeliers for a dining room"}'
 ```
 
-## Dashboard: check whether mapping a site makes a difference
+## Dashboard: showcase index, performance, and live agent calls
 
-Open <http://localhost:8080/dashboard> with the server running:
+Open <http://localhost:8080/dashboard> with the server running. The dashboard never runs calls itself — call from your agent, watch the results land here:
 
-1. **Credentials** — paste your `am_live_…` key (kept only in that browser tab).
-2. **Index a website** — type a domain (e.g. `paulaschoice.com`), click **Request mapping**, then **Check is_mapped**. First mapping takes seconds-to-minutes (the indexer is crawling); once `mapped: true` with a `map_version`, the site is queryable. This is the *"domain input"* for testing a new site.
-3. **Call explorer** — pick `find`, edit the JSON (domain + shopping question), **Send**. Compare the compact steps/URL you get back against opening that site raw in a browser agent.
-4. **Recent calls / Performance** — every call you just made, with latency and per-tool p95. A mapped `find` should be milliseconds; the first crawl is the slow, one-time cost.
+1. **Credentials** — paste your `am_live_…` key (kept only in that browser tab). It unlocks the live call feed.
+2. **Index** — sites mapped/queued, nodes and edges indexed, and whether the `node_embedding_hnsw` / `path_cache_embedding_hnsw` vector indexes exist.
+3. **Recent calls** — which agent called, which tool, what the MCP returned (e.g. `found, 3 steps`), latency, and status. Auto-refreshes every 5 seconds.
+4. **Performance** — per-tool calls, errors, average and p95 latency since this process started. A mapped `find` should be milliseconds; the first crawl is the slow, one-time cost.
 5. **Merchant Dashboard** (admin token) — per-domain agent demand and journeys: which sites agents ask about most, i.e. where mapping pays off next.
 
 To quantify the difference on a site, run the benchmark the same way we did: same tasks through raw crawl vs the MCP — `pnpm --filter @agentmap/bench bench:speed` (needs `MCP_BASE_URL` + `AGENTMAP_API_KEY`). Method and full results: [docs/bench/2026-11-02-speed.md](docs/bench/2026-11-02-speed.md).
@@ -133,7 +144,11 @@ Why a shared map beats per-agent browsing:
 2. **API/connectors** rarely exist for merchant sites, and each integration is bespoke.
 3. **Browser/computer use** costs thousands of tokens per step, breaks on layout changes and bot walls, and forgets everything when the session ends.
 
-More: [docs/demo/QA.md](docs/demo/QA.md) (design rationale, unbuilt optimizations, will-this-be-replaced), [docs/demo/VIDEO-SCRIPT.md](docs/demo/VIDEO-SCRIPT.md) (3-minute demo), [doc/plan.md](doc/plan.md) (full implementation plan), [docs/OPEN-ITEMS.md](docs/OPEN-ITEMS.md) (status and open decisions).
+More: [docs/demo/QA.md](docs/demo/QA.md) (design rationale, unbuilt optimizations, will-this-be-replaced), [docs/demo/VIDEO-SCRIPT.md](docs/demo/VIDEO-SCRIPT.md) (3-minute demo), [docs/roadmap.md](docs/roadmap.md) (what remains).
+
+## Future (optional): coupons
+
+Coupon support exists only as a dark seam (`find_offers`, off by default). The hunter sweep worker, incentive ledger, and merchant dashboard are not built — they wait on owner pricing/sharing decisions (see [roadmap](docs/roadmap.md)). Details: [Coupon mining](docs/demo/COUPON-MINING.md).
 
 ## License / data policy
 

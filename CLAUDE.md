@@ -25,19 +25,18 @@ pnpm monorepo (Node ≥20, pnpm 9). Postgres+pgvector via `docker-compose.yml`; 
 | `packages/offers` | Coupon seam: `getOffers` + `EmptyOfferProvider`, eligibility logic, and (beyond Phase 0 scope) public-page ingest. Gated by `OFFERS_ENABLED`. |
 | `tools/bench` | Benchmark harness: corpora (`corpus/*.json`), raw-browsing proxy arm vs mapped arm, report writer → `docs/bench/`. |
 | `test/e2e` | Boots the compiled server end-to-end. |
-| `docs/` | `adr/` decisions, `bench/` reports, `runbooks/` ops procedures, `data-policy.md`, `site-status.md` (per-domain index state), `OPEN-ITEMS.md`. |
+| `docs/` | `adr/` decisions, `bench/` reports, `runbooks/` ops procedures, `roadmap.md` (remaining work), `data-policy.md`, `site-status.md` (per-domain index state). |
 | `scripts/` | Repo guardrails (offers grep-gate). |
 
 ## Planning documents
 
-- `agentmap-proposal-and-spec.md` — Proposal + Design Spec v0.1 (§§1–23): problem, goals/non-goals, system overview, data model, MCP tools, core flows, freshness, compliance, benchmark plan, roadmap.
-- `doc/plan.md` — Implementation plan v0.2 (§§1–23 + appendices): success criteria S1–S6, locked decisions, architecture, repo layout (§4), data model, per-app specs, coupon seam (§16), testing/benchmark/validation gates (§§17–19), work plan W1–W15 (§20). Check a step's entry/exit criteria here before implementing it.
+- `docs/roadmap.md` — What remains after Phase 0 (W1–W15 are done): deferred owner decisions, unbuilt slices, and where the records live.
 
 ## What is being built
 
 **AgentMap**: a hosted, shared, pre-built map of how to use websites, served to AI agents over MCP. The first agent to need a site pays the discovery cost; later agents get a short, cheap answer. Phase 0 MCP tools: `is_mapped`, `find`, `get_path`, `live_check`, `report_outcome`, `request_mapping`, `my_sites`.
 
-## Locked decisions (doc/plan.md §2 — changing any requires an ADR + plan revision, not a silent code change)
+## Locked decisions (changing any requires an ADR, not a silent code change)
 
 - **D1** TypeScript on Node.js LTS everywhere in Phase 0–1. No Rust until a profile triggers it (plan §2.2: indexer CPU saturation → live-verifier latency → `find` p99).
 - **D2** Remote hosted MCP over Streamable HTTP, single `/mcp` endpoint (POST + GET), MCP spec 2025-03-26. Not stdio.

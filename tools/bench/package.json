@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "bench:speed": "node dist/speed-main.js",
-    "bench:eval": "node dist/live-eval.js"
+    "bench:eval": "node dist/live-eval.js",
+    "bench:cache": "node dist/cache-main.js"
   },
   "devDependencies": {
     "vitest": "^2.1.0",

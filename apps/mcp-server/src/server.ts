@@ -16,10 +16,30 @@ export function createApp(deps: AppDeps) {
   const limiter = deps.rateLimiter ?? new TokenBucketRateLimiter();
   const logger = deps.logger ?? ((l: string) => console.log(l));
   // Ops dashboard feed: last 200 tool calls, in memory only (never persisted).
-  const recentCalls: { ts: string; tool: string; agent_id: string; latency_ms: number; ok: boolean; code?: string }[] = [];
-  function recordCall(name: string, auth: AuthContext, t0: number, ok: boolean, code?: string) {
-    recentCalls.push({ ts: new Date().toISOString(), tool: name, agent_id: auth.agentId, latency_ms: Date.now() - t0, ok, ...(code ? { code } : {}) });
+  const recentCalls: { ts: string; tool: string; agent_id: string; latency_ms: number; ok: boolean; code?: string; summary?: string }[] = [];
+  function recordCall(name: string, auth: AuthContext, t0: number, ok: boolean, code?: string, summary?: string) {
+    recentCalls.push({ ts: new Date().toISOString(), tool: name, agent_id: auth.agentId, latency_ms: Date.now() - t0, ok, ...(code ? { code } : {}), ...(summary ? { summary } : {}) });
     if (recentCalls.length > 200) recentCalls.splice(0, recentCalls.length - 200);
+  }
+  /** One-line result for the dashboard feed: what the MCP returned. Never throws. */
+  function summarizeResult(name: string, out: any): string {
+    try {
+      switch (name) {
+        case "find":
+          if (!out || typeof out !== "object") return "—";
+          if (out.mapped === false) return `miss (${out.status ?? "queued"})`;
+          if (out.found === false) return `no_path${out.reason ? ` (${out.reason})` : ""}`;
+          return `found, ${Array.isArray(out.steps) ? out.steps.length : 0} steps`;
+        case "is_mapped": return out?.mapped ? `mapped v${out.map_version}` : String(out?.status ?? "unmapped");
+        case "get_path": return `${Array.isArray(out?.steps) ? out.steps.length : 0} steps`;
+        case "live_check": return String(out?.status ?? "—");
+        case "report_outcome": return String(out?.branch_status ?? "ack");
+        case "request_mapping": return out?.already_mapped ? "already mapped" : `queued #${out?.queue_position ?? "?"}`;
+        case "my_sites": return Array.isArray(out?.sites) ? `${out.sites.length} sites` : "ok";
+        case "find_offers": return `${Array.isArray(out?.offers) ? out.offers.length : 0} offers`;
+        default: return "ok";
+      }
+    } catch { return "—"; }
   }
   async function callTool(name: string, args: any, auth: AuthContext) {
     const t0 = Date.now();
@@ -40,7 +60,7 @@ export function createApp(deps: AppDeps) {
     } })();
     metricsReg.observe("tool_latency_ms", Date.now() - t0, { tool: name }); metricsReg.inc("tool_calls_total", { tool: name });
     logger(structuredLog({ level: "info", service: "mcp-server", request_id: randomUUID(), agent_id: auth.agentId, tool: name, latency_ms: Date.now() - t0 }));
-    recordCall(name, auth, t0, true);
+    recordCall(name, auth, t0, true, undefined, summarizeResult(name, out));
     return out;
     } catch (e) { metricsReg.inc("tool_errors_total", { tool: name, code: (e as any)?.code ?? "internal" }); metricsReg.observe("tool_latency_ms", Date.now() - t0, { tool: name }); recordCall(name, auth, t0, false, (e as any)?.code ?? "internal"); throw e; }
   }
@@ -87,7 +107,7 @@ export function createApp(deps: AppDeps) {
     try {
       if (url.pathname === "/dashboard") { res.writeHead(200, { "content-type": "text/html; charset=utf-8" }); res.end(DASHBOARD_HTML); return; }
       if (url.pathname === "/") { sendJson(res, 200, { name: "agentmap", version: "0.1.0", mcp: "/mcp", rest: "/api/v1", data_policy: "/.well-known/data-policy", dashboard: "/dashboard" }); return; }
-      if (url.pathname === "/.well-known/data-policy") { const body = "AgentMap data policy: we crawl public site structure only, honour robots.txt and merchant opt-out, never store shopper personal data, never cache price/stock as truth, and record per-agent behaviour (questions hashed). Full text: docs/data-policy.md in the agent-bureau repo.\n"; res.writeHead(200, { "content-type": "text/plain; charset=utf-8" }); res.end(body); return; }
+      if (url.pathname === "/.well-known/data-policy") { const body = "AgentMap data policy: we crawl public site structure only, honour robots.txt and merchant opt-out, never store shopper personal data, never cache price/stock as truth, and record per-agent behaviour (questions hashed). Full text: docs/data-policy.md.\n"; res.writeHead(200, { "content-type": "text/plain; charset=utf-8" }); res.end(body); return; }
       if (url.pathname === "/healthz") { sendJson(res, 200, { ok: true }); return; }
       if (url.pathname === "/metrics") { const body = metricsReg.renderPrometheus(); res.writeHead(200, { "content-type": "text/plain; version=0.0.4" }); res.end(body); return; }
       if (url.pathname === "/readyz") { const ok = await deps.store.ping(); sendJson(res, ok ? 200 : 503, { ok }); return; }
@@ -149,6 +169,11 @@ export function createApp(deps: AppDeps) {
         const auth = await authenticate(deps.store, deps.pepper, req.headers.authorization).catch((e) => { events.write({ agent_id: null, domain: null, type: "auth_rejected", metadata: { error_code: "unauthorized" } }); throw e; });
         const result = await callTool("is_mapped", { domain: url.searchParams.get("domain") ?? "" }, auth); sendJson(res, 200, result); return;
       }
+      // Showcase index stats (public, like /metrics): what is indexed, which vector indexes exist.
+      if (url.pathname === "/api/v1/index-stats" && req.method === "GET") {
+        if (!deps.store.indexStats) { sendJson(res, 501, { error: "not implemented" }); return; }
+        sendJson(res, 200, await deps.store.indexStats()); return;
+      }
       // Ops dashboard feed (authenticated): most recent tool calls, newest first.
       if (url.pathname === "/api/v1/recent-calls" && req.method === "GET") {
         await authenticate(deps.store, deps.pepper, req.headers.authorization).catch((e) => { events.write({ agent_id: null, domain: null, type: "auth_rejected", metadata: { error_code: "unauthorized" } }); throw e; });
@@ -173,7 +198,7 @@ export function zodToJsonSchema(schema: any): any {
 function sendJson(res: ServerResponse, status: number, body: unknown) { const s = JSON.stringify(body); res.writeHead(status, { "content-type": "application/json", "content-length": Buffer.byteLength(s) }); res.end(s); }
 async function readJson(req: IncomingMessage) { const chunks: Buffer[] = []; for await (const c of req) chunks.push(c as Buffer); const t = Buffer.concat(chunks).toString("utf8"); if (!t) return {}; try { return JSON.parse(t); } catch { throw new AgentMapError("invalid_input", "body: invalid JSON"); } }
 
-/** Ops + Merchant dashboard: per-call explorer, index-a-site, performance, and Phase 3 merchant demand/journeys. Secrets stay in this browser tab only. */
+/** Showcase dashboard: calling snippet, index counts, performance, live agent-call feed, and Phase 3 merchant demand/journeys. Secrets stay in this browser tab only. */
 const DASHBOARD_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AgentMap Dashboard</title>
 <style>
 :root{--accent:#1a6b4a;--ink:#1c2420;--muted:#5b6660;--line:#dfe5e1;--bg:#f4f6f4;--card:#ffffff;--err:#a4262c;--ok:#1a6b4a}
@@ -199,27 +224,22 @@ th{color:var(--muted);font-weight:600;font-size:.78rem}td.num{text-align:right;f
 .bar{height:.5rem;background:var(--bg);border-radius:3px;overflow:hidden;min-width:6rem}.bar>i{display:block;height:100%;background:var(--accent)}
 .status-err{color:var(--err);font-weight:600}.status-ok{color:var(--ok);font-weight:600}
 </style></head>
-<body><header><h1>AgentMap — Dashboard</h1><p>Calls, indexing, and performance for this MCP server. Keys stay in this tab only.</p></header>
+<body><header><h1>AgentMap — Dashboard</h1><p>What is indexed, how fast it answers, and which agents are calling. Agents call from their own side — this page only watches. Keys stay in this tab only.</p></header>
 <main>
 <section><h2>Credentials</h2>
-<p class="hint">One API key unlocks the call explorer, index-a-site, and recent calls. Get one from <code>agentmap-admin issue-key</code>.</p>
+<p class="hint">One API key unlocks the live call feed below. Get one from <code>agentmap-admin issue-key</code>.</p>
 <label for="key">API key</label><input id="key" type="password" autocomplete="off" placeholder="am_live_…" style="max-width:34rem">
 </section>
-<section><h2>Status</h2><div class="badges" id="status"><span class="badge">loading…</span></div>
-<div class="row"><div><button class="ghost" id="refresh-status">Refresh status</button></div></div></section>
-<section><h2>Index a website</h2>
-<p class="hint">Queues a domain for mapping (the Indexer picks it up), then check whether the map is ready.</p>
-<div class="row"><div><label for="idx-domain">Domain</label><input id="idx-domain" placeholder="example.com"></div></div>
-<div class="row"><div><button id="idx-go">Request mapping</button> <button class="ghost" id="idx-check">Check is_mapped</button></div></div>
-<pre id="idx-out">—</pre></section>
-<section><h2>Call explorer</h2>
-<p class="hint">Call any MCP tool through its REST mirror and inspect the JSON result.</p>
-<div class="row"><div><label for="tool">Tool</label><select id="tool"></select></div></div>
-<label for="args">Arguments (JSON)</label><textarea id="args" spellcheck="false"></textarea>
-<div class="row"><div><button id="send">Send</button></div></div>
-<pre id="call-out">—</pre></section>
-<section><h2>Recent calls</h2><p class="hint">Last tool calls served by this process. Auto-refreshes every 5 seconds while the tab is visible.</p>
-<table><thead><tr><th>Time</th><th>Tool</th><th>Agent</th><th style="text-align:right">ms</th><th>Status</th></tr></thead><tbody id="recent"><tr><td colspan="5">—</td></tr></tbody></table></section>
+<section><h2>Call it from any agent</h2>
+<p class="hint">The snippet external agents use. No live testing here — call from your agent, watch the feed below.</p>
+<pre>curl -s localhost:8080/api/v1/find -H "Authorization: Bearer am_live_…" \\
+  -H 'content-type: application/json' \\
+  -d '{"domain":"shadesoflight.com","question":"chandeliers for a dining room"}'</pre></section>
+<section><h2>Index</h2><p class="hint">What is indexed and which vector indexes exist. Source: <code>/api/v1/index-stats</code>. Auto-refreshes every 5 seconds.</p>
+<div class="badges" id="idx"><span class="badge">loading…</span></div>
+<div class="row"><div><button class="ghost" id="refresh-idx">Refresh index stats</button></div></div></section>
+<section><h2>Recent calls</h2><p class="hint">Which agent called, and what the MCP returned. Auto-refreshes every 5 seconds while the tab is visible.</p>
+<table><thead><tr><th>Time</th><th>Agent</th><th>Tool</th><th>Result</th><th style="text-align:right">ms</th><th>Status</th></tr></thead><tbody id="recent"><tr><td colspan="6">—</td></tr></tbody></table></section>
 <section><h2>Performance</h2><p class="hint">Totals, errors, and latency per tool since this process started. Source: <code>/metrics</code>.</p>
 <table><thead><tr><th>Tool</th><th style="text-align:right">Calls</th><th style="text-align:right">Errors</th><th style="text-align:right">Avg ms</th><th style="text-align:right">p95 ms</th><th>p95</th></tr></thead><tbody id="perf"><tr><td colspan="6">—</td></tr></tbody></table></section>
 <section><h2>Merchant Dashboard <span class="tag">Phase 3</span></h2>
@@ -231,58 +251,28 @@ th{color:var(--muted);font-weight:600;font-size:.78rem}td.num{text-align:right;f
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
-const SLUGS = {"is_mapped":"is-mapped","find":"find","get_path":"get-path","live_check":"live-check","report_outcome":"report-outcome","request_mapping":"request-mapping","my_sites":"my-sites"};
-const TEMPLATES = {
-"is_mapped": {"domain":"example.com"},
-"find": {"domain":"example.com","question":"brake pads for a 2019 civic"},
-"get_path": {"domain":"example.com","goal":"search results"},
-"live_check": {"url":"https://example.com/product/123","fields":["price","stock"]},
-"report_outcome": {"domain":"example.com","path_id":"p_00000000-0000-4000-8000-000000000000","success":true},
-"request_mapping": {"domain":"example.com"},
-"my_sites": {"action":"list"}
-};
-const toolSel = $("tool");
-for (const t of Object.keys(SLUGS)) { const o = document.createElement("option"); o.value = t; o.textContent = t; toolSel.appendChild(o); }
-toolSel.value = "find"; $("args").value = JSON.stringify(TEMPLATES[toolSel.value], null, 2);
-toolSel.onchange = () => { $("args").value = JSON.stringify(TEMPLATES[toolSel.value], null, 2); };
 const key = () => $("key").value.trim();
 function authHeaders(extra) { return Object.assign({"content-type":"application/json"}, key() ? {"authorization":"Bearer " + key()} : {}, extra); }
-async function status() {
-  const el = $("status"); el.innerHTML = "<span class='badge'>loading…</span>";
-  try {
-    const [h, r] = await Promise.all([fetch("/healthz").then((x) => x.json()), fetch("/readyz").then((x) => x.json().then((b) => ({code:x.status, body:b})))]);
-    el.innerHTML = "<span class='badge'>healthz <b class='" + (h.ok ? "ok'>ok" : "err'>FAIL") + "</b></span>" +
-      "<span class='badge'>readyz (db) <b class='" + (r.body.ok ? "ok'>ok" : "err'>FAIL " + r.code) + "</b></span>";
-  } catch (e) { el.innerHTML = "<span class='badge'>unreachable: " + String(e).replace(/</g,"&lt;") + "</span>"; }
-}
-$("refresh-status").onclick = status; status();
-$("idx-go").onclick = async () => {
-  const out = $("idx-out"); out.textContent = "…";
-  try { const r = await fetch("/api/v1/request-mapping", {method:"POST", headers:authHeaders(), body:JSON.stringify({domain:$("idx-domain").value.trim()})});
-    out.textContent = r.status + "\\n" + JSON.stringify(await r.json(), null, 2); }
-  catch (e) { out.textContent = String(e); }
-};
-$("idx-check").onclick = async () => {
-  const out = $("idx-out"); out.textContent = "…";
-  try { const r = await fetch("/api/v1/is-mapped?domain=" + encodeURIComponent($("idx-domain").value.trim()), {headers:authHeaders()});
-    out.textContent = r.status + "\\n" + JSON.stringify(await r.json(), null, 2); }
-  catch (e) { out.textContent = String(e); }
-};
-$("send").onclick = async () => {
-  const out = $("call-out"); out.textContent = "…";
-  let body = {}; try { body = JSON.parse($("args").value || "{}"); } catch (e) { out.textContent = "arguments: invalid JSON"; return; }
-  try { const r = await fetch("/api/v1/" + SLUGS[toolSel.value], {method:"POST", headers:authHeaders(), body:JSON.stringify(body)});
-    out.textContent = r.status + "\\n" + JSON.stringify(await r.json(), null, 2); refreshRecent(); }
-  catch (e) { out.textContent = String(e); }
-};
 function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+async function refreshIndex() {
+  const el = $("idx"); el.innerHTML = "<span class='badge'>loading…</span>";
+  try {
+    const [h, s] = await Promise.all([fetch("/healthz").then((x) => x.json()).catch(() => ({ok:false})), fetch("/api/v1/index-stats").then((x) => x.json())]);
+    const badge = (label, val, cls) => "<span class='badge'>" + label + " <b class='" + (cls || "") + "'>" + esc(val) + "</b></span>";
+    el.innerHTML = badge("server", h.ok ? "ok" : "FAIL", h.ok ? "ok" : "err") +
+      badge("sites mapped", s.sites.mapped) + badge("sites queued", s.sites.queued) +
+      badge("nodes", s.nodes) + badge("edges", s.edges) +
+      s.vector_indexes.map((v) => badge(v.name, v.present ? "indexed" : "absent", v.present ? "ok" : "err")).join("");
+  } catch (e) { el.innerHTML = "<span class='badge'>unreachable: " + esc(String(e)) + "</span>"; }
+}
+$("refresh-idx").onclick = refreshIndex; refreshIndex();
 async function refreshRecent() {
-  const tb = $("recent"); if (!key()) { tb.innerHTML = "<tr><td colspan='5'>enter an API key above</td></tr>"; return; }
+  const tb = $("recent"); if (!key()) { tb.innerHTML = "<tr><td colspan='6'>enter an API key above</td></tr>"; return; }
   try { const r = await fetch("/api/v1/recent-calls?n=20", {headers:authHeaders()});
-    if (!r.ok) { tb.innerHTML = "<tr><td colspan='5'>HTTP " + r.status + "</td></tr>"; return; }
+    if (!r.ok) { tb.innerHTML = "<tr><td colspan='6'>HTTP " + r.status + "</td></tr>"; return; }
     const calls = (await r.json()).calls || [];
-    tb.innerHTML = calls.length ? calls.map((c) => "<tr><td>" + esc(c.ts) + "</td><td>" + esc(c.tool) + "</td><td>" + esc(String(c.agent_id).slice(0,8)) + "…</td><td class='num'>" + c.latency_ms + "</td><td class='" + (c.ok ? "status-ok'>ok" : "status-err'>FAIL " + esc(c.code || "")) + "</td></tr>").join("") : "<tr><td colspan='5'>no calls yet — send one above</td></tr>";
-  } catch (e) { tb.innerHTML = "<tr><td colspan='5'>" + esc(String(e)) + "</td></tr>"; }
+    tb.innerHTML = calls.length ? calls.map((c) => "<tr><td>" + esc(c.ts) + "</td><td>" + esc(String(c.agent_id).slice(0,8)) + "…</td><td>" + esc(c.tool) + "</td><td>" + esc(c.summary || "—") + "</td><td class='num'>" + c.latency_ms + "</td><td class='" + (c.ok ? "status-ok'>ok" : "status-err'>FAIL " + esc(c.code || "")) + "</td></tr>").join("") : "<tr><td colspan='6'>no calls yet — call from your agent and watch them land here</td></tr>";
+  } catch (e) { tb.innerHTML = "<tr><td colspan='6'>" + esc(String(e)) + "</td></tr>"; }
 }
 async function refreshPerf() {
   const tb = $("perf");
@@ -314,6 +304,6 @@ document.getElementById('go').onclick = async () => {
     document.getElementById(id).textContent = JSON.stringify(await r.json(), null, 2);
   }
 };
-setInterval(() => { if (!document.hidden) { refreshRecent(); refreshPerf(); } }, 5000);
+setInterval(() => { if (!document.hidden) { refreshRecent(); refreshPerf(); refreshIndex(); } }, 5000);
 refreshRecent(); refreshPerf();
 </script></body></html>`;

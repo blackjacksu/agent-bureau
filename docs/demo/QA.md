@@ -1,6 +1,6 @@
 # Demo Q&A — design rationale, unbuilt performance work, and the survival question
 
-Use this when someone asks hard questions during or after the [3-minute video](./VIDEO-SCRIPT.md). Short answers first; the evidence links are the long answer. Numbers are from [../bench/2026-11-02-speed.md](../bench/2026-11-02-speed.md) and [../../doc/NEXT-STEP-BRIEF.md](../../doc/NEXT-STEP-BRIEF.md).
+Use this when someone asks hard questions during or after the [3-minute video](./VIDEO-SCRIPT.md). Short answers first; the evidence links are the long answer. Numbers are from [../bench/2026-11-02-speed.md](../bench/2026-11-02-speed.md).
 
 ## Why is it designed this way?
 
@@ -25,14 +25,14 @@ Because a stale price is worse than no price. The map stores *how to get there* 
 **Q: Why is the crawler polite — robots.txt, rate limits, no bot-wall evasion?**
 Three of the original target sites bot-walled us and we recorded `blocked: bot_protection` rather than evading (see [../site-status.md](../site-status.md)). A map built by evasion is a legal and operational liability that disappears the moment the site notices. Merchant-opt-in crawling is the long-term answer, not better fingerprint spoofing.
 
-## What would make it faster that we have *not* implemented yet?
+## What made it faster, and what is still open?
 
-From [NEXT-STEP-BRIEF §6–§7](../../doc/NEXT-STEP-BRIEF.md), in priority order. None of these is in the current build — saying so on camera is a feature, not a confession.
+Items 1–3 have landed since; item 4 remains open (see [roadmap](../roadmap.md)). Saying the open part on camera is a feature, not a confession.
 
-1. **SQL top-k retrieval (the big one, no vendor needed).** Today `find` loads *every* node and embedding from Postgres and re-ranks in JavaScript (`apps/mcp-server/src/store.ts`, `packages/matching/src/matching.ts`). The pgvector HNSW index exists in the schema but the query path never uses it. That is why carparts.com answers in ~450 ms while smaller sites answer in 16 ms. Fix: `ORDER BY embedding <=> $1 LIMIT 24`, compose paths only inside that neighbourhood, add a 60-second result cache. Expected: 450 ms → <50 ms.
-2. **Hosted embeddings + a reranker.** Live numbers currently run on a deterministic token-hash embedding with a lexical-overlap patch — no real semantics. That caps exact-target precision at 77%. A hosted embedding API (Fireworks, OpenAI-compatible; the adapter already exists in `packages/matching/src/embeddings.ts`) plus a small reranker over the top-k candidates is the largest *quality* gain available, and it is what makes `tokens_saved_estimate` honest enough to publish.
-3. **Sitemap-aware indexing.** The benchmark's optimized crawl arm exploits merchant sitemaps to jump straight to categories; the production indexer only walks links. Consuming sitemaps would make first-time indexing faster and graphs more complete — our own benchmark currently out-crawls our own indexer here.
-4. **An elastic crawl fleet (Modal).** Indexer/verifier workers move to scale-to-zero containers for burst re-indexing and freshness sweeps. This fixes freshness-at-scale, not query latency — which is why it is third, and why Baseten (dedicated GPU serving for a custom model we do not yet run) is explicitly *not* requested yet.
+1. **SQL top-k retrieval — done.** `find` uses the pgvector HNSW index plus a 60-second result cache (carparts ~35 ms).
+2. **Hosted embeddings + reranker — provider done.** Nomic embeddings via an OpenAI-compatible endpoint; the reranker itself is still open.
+3. **Sitemap-aware indexing — done.** The frontier seeds from sitemaps.
+4. **An elastic crawl fleet (Modal) — open.** Scale-to-zero workers for burst re-indexing; a freshness fix, not a latency fix.
 
 ## What is the ultimate goal — and will we be replaced?
 

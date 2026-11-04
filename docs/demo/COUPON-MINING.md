@@ -66,7 +66,7 @@ Today the map is built by *our* crawler. The network version: an agent that succ
 | Incentive ledger + credit payout on verified reuse | **Missing** — needs Q1 (pricing/credits) owner decision, currently deferred |
 | Merchant offer dashboard / opt-in feed | **Missing** — needs Q4 (merchant terms) owner decision, currently deferred |
 
-Honest sequencing: the retrieval fix and hosted embeddings come first ([NEXT-STEP-BRIEF](../../doc/NEXT-STEP-BRIEF.md)); coupon mining is the first *network* feature after them, and it cannot fully launch until the owner undeferrs Q1/Q4. The demo may show the flag-gated tool existing — it may not show live coupon earnings.
+Honest sequencing: the retrieval fix and hosted embeddings are done (see [roadmap](../roadmap.md)); coupon mining is the first *network* feature after them, and it cannot fully launch until the owner undeferrs Q1/Q4. The demo may show the flag-gated tool existing — it may not show live coupon earnings.
 
 ## The 20-second demo version (if asked)
 
