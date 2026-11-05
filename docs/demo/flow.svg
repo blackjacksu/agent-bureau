@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+  <rect x="0" y="0" width="960" height="600" fill="#ffffff"/>
+  <text x="480" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#111">AgentMap — crawl once, share the map</text>
+  <text x="480" y="58" text-anchor="middle" font-size="13" fill="#555">The L1 cache for agent commerce: agents are cores, the map is cache, merchant sites are DRAM</text>
+
+  <!-- LEFT: without -->
+  <rect x="20" y="78" width="440" height="442" rx="10" fill="#fdf2f2" stroke="#e08080"/>
+  <text x="240" y="104" text-anchor="middle" font-size="15" font-weight="700" fill="#a33">WITHOUT AgentMap (every agent re-reads DRAM)</text>
+  <rect x="60" y="120" width="360" height="44" rx="6" fill="#fff" stroke="#a33"/>
+  <text x="240" y="147" text-anchor="middle" font-size="13" fill="#111">Personal agent opens the store raw</text>
+  <line x1="240" y1="164" x2="240" y2="188" stroke="#a33" stroke-width="2"/>
+  <polygon points="240,196 233,186 247,186" fill="#a33"/>
+  <rect x="60" y="196" width="360" height="88" rx="6" fill="#fff" stroke="#a33"/>
+  <text x="240" y="220" text-anchor="middle" font-size="13" fill="#111">Search page &#8594; category &#8594; filters &#8594; product</text>
+  <text x="240" y="240" text-anchor="middle" font-size="13" fill="#111">HTML / DOM / screenshots, guess each click</text>
+  <text x="240" y="260" text-anchor="middle" font-size="12" fill="#a33">10&#8308;&#8211;10&#10105; tokens per page, repeated per task</text>
+  <line x1="240" y1="284" x2="240" y2="308" stroke="#a33" stroke-width="2"/>
+  <polygon points="240,316 233,306 247,306" fill="#a33"/>
+  <rect x="60" y="316" width="360" height="44" rx="6" fill="#fff" stroke="#a33"/>
+  <text x="240" y="343" text-anchor="middle" font-size="13" fill="#111">Answer (maybe — layout changed, bot wall)</text>
+  <rect x="60" y="380" width="360" height="118" rx="6" fill="#fbe3e3" stroke="#a33"/>
+  <text x="240" y="404" text-anchor="middle" font-size="13" font-weight="700" fill="#a33">Measured per task (60 real shopping tasks)</text>
+  <text x="240" y="428" text-anchor="middle" font-size="13" fill="#111">~83k tokens optimized crawl &#183; ~313k naive</text>
+  <text x="240" y="450" text-anchor="middle" font-size="13" fill="#111">~200&#8211;300 ms cold &#183; 52&#8211;55% success</text>
+  <text x="240" y="472" text-anchor="middle" font-size="12" fill="#555">Nothing learned is shared with the next agent</text>
+
+  <!-- RIGHT: with -->
+  <rect x="500" y="78" width="440" height="442" rx="10" fill="#eef7ee" stroke="#4a9a4a"/>
+  <text x="720" y="104" text-anchor="middle" font-size="15" font-weight="700" fill="#2a7a2a">WITH AgentMap (cache hit)</text>
+  <rect x="540" y="120" width="360" height="44" rx="6" fill="#fff" stroke="#2a7a2a"/>
+  <text x="720" y="147" text-anchor="middle" font-size="13" fill="#111">Agent calls find(domain, question)</text>
+  <line x1="720" y1="164" x2="720" y2="188" stroke="#2a7a2a" stroke-width="2"/>
+  <polygon points="720,196 713,186 727,186" fill="#2a7a2a"/>
+  <rect x="540" y="196" width="360" height="66" rx="6" fill="#fff" stroke="#2a7a2a"/>
+  <text x="720" y="220" text-anchor="middle" font-size="13" fill="#111">Versioned site graph: navigation, search,</text>
+  <text x="720" y="240" text-anchor="middle" font-size="13" fill="#111">filters, URL templates (never prices)</text>
+  <line x1="720" y1="262" x2="720" y2="286" stroke="#2a7a2a" stroke-width="2"/>
+  <polygon points="720,294 713,284 727,284" fill="#2a7a2a"/>
+  <rect x="540" y="294" width="360" height="44" rx="6" fill="#fff" stroke="#2a7a2a"/>
+  <text x="720" y="321" text-anchor="middle" font-size="13" fill="#111">live_check: price / stock re-verified live</text>
+  <rect x="540" y="358" width="360" height="60" rx="6" fill="#ddf0dd" stroke="#2a7a2a"/>
+  <text x="720" y="382" text-anchor="middle" font-size="13" font-weight="700" fill="#2a7a2a">~250 tokens &#183; ~8&#8211;16 ms &#183; 68&#8211;77% success</text>
+  <text x="720" y="402" text-anchor="middle" font-size="12" fill="#555">report_outcome feeds back: the map self-heals</text>
+  <rect x="540" y="430" width="360" height="68" rx="6" fill="#fff" stroke="#2a7a2a" stroke-dasharray="6 4"/>
+  <text x="720" y="452" text-anchor="middle" font-size="12" fill="#111">Cache miss (unmapped site)? request_mapping</text>
+  <text x="720" y="472" text-anchor="middle" font-size="12" fill="#111">crawls once, politely &#8212; every later agent hits</text>
+
+  <!-- Analogy strip -->
+  <rect x="20" y="532" width="920" height="52" rx="8" fill="#f2f4f8" stroke="#889"/>
+  <text x="480" y="553" text-anchor="middle" font-size="12" fill="#111">Hardware view: agent = CPU core &#183; site graph = L1 cache / TLB (caches the route, not the data)</text>
+  <text x="480" y="571" text-anchor="middle" font-size="12" fill="#111">merchant site = DRAM (slow) &#183; live_check = uncacheable read of a volatile register (price)</text>
+</svg>
